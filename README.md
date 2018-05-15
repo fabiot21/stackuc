@@ -1,7 +1,7 @@
-## React Redux Starter
+## StackUC
 
 ```
-cd redux-starter
+cd stackuc
 npm install
 npm start
 ```
