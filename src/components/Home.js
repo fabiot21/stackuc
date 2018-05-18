@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import logo from '../logo.svg';
 
+import M from 'materialize-css';
+
 import { base, fbase } from './FireBase';
 
 class Home extends Component {
