@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import LoginForm from './LoginForm';
 import RegisterForm from './RegisterForm';
 import { fLogout, auth } from './FireBase';
-import { Input, Menu, Icon, Modal } from 'semantic-ui-react'
+import Logo from '../assets/logo.png';
+import { Input, Menu, Icon, Modal, Image } from 'semantic-ui-react'
 
 export default class Header extends Component {
   state = {
@@ -31,8 +32,8 @@ export default class Header extends Component {
 
     return (
       <Menu className="container" secondary>
-        <Menu.Item name="home" active={activeItem === 'home'} onClick={this.handleItemClick}>
-          <Icon name='home' />
+        <Menu.Item name="home" onClick={this.handleItemClick}>
+          <Image size="small" src={Logo} />
         </Menu.Item>
         <Menu.Item name='hacer pregunta' active={activeItem === 'hacer pregunta'} onClick={this.handleItemClick} />
         <Menu.Item name='crear tutoriales' active={activeItem === 'crear tutoriales'} onClick={this.handleItemClick} />
