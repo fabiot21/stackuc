@@ -48,7 +48,7 @@ export default class Header extends Component {
                 </Modal>
               </Menu.Item>
           ) : (
-            <Menu.Item name='logout' active={activeItem === 'logout'} onClick={() => this.logout()} />
+            <Menu.Item name='Cerrar Sesión' active={activeItem === 'Cerrar Sesión'} onClick={() => this.logout()} />
           )}
           {!this.state.activeUser? (
             <Menu.Item name='register' active={activeItem === 'register'} onClick={this.handleItemClick}>
