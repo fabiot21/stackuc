@@ -1,11 +1,30 @@
 import React, { Component } from 'react';
 import LoginForm from './LoginForm';
+import RegisterForm from './RegisterForm';
+import { fLogout, auth } from './FireBase';
 import { Input, Menu, Icon, Modal } from 'semantic-ui-react'
 
-export default class MenuExampleSecondary extends Component {
-  state = { activeItem: 'home' }
+export default class Header extends Component {
+  state = {
+    activeItem: 'home',
+    activeUser: false
+   }
+
+  componentDidMount() {
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        this.setState({ activeUser: true })
+      } else {
+        this.setState({ activeUser: false })
+      }
+    })
+  }
 
   handleItemClick = (e, { name }) => this.setState({ activeItem: name })
+
+  logout() {
+    fLogout()
+  }
 
   render() {
     const { activeItem } = this.state
@@ -21,12 +40,22 @@ export default class MenuExampleSecondary extends Component {
           <Menu.Item>
             <Input icon='search' placeholder='Buscar...' />
           </Menu.Item>
-          <Menu.Item name='Iniciar sesión' active={activeItem === 'logout'} onClick={this.handleItemClick}>
-            <Modal trigger={<div>Iniciar Sesión</div>}>
-              <LoginForm />
-            </Modal>
-          </Menu.Item>
-          <Menu.Item name='Cerrar sesión' active={activeItem === 'logout'} onClick={this.handleItemClick} />
+          {!this.state.activeUser? (
+              <Menu.Item name='login' active={activeItem === 'login'} onClick={this.handleItemClick}>
+                <Modal trigger={<div>Iniciar Sesión</div>}>
+                  <LoginForm />
+                </Modal>
+              </Menu.Item>
+          ) : (
+            <Menu.Item name='logout' active={activeItem === 'logout'} onClick={() => this.logout()} />
+          )}
+          {!this.state.activeUser? (
+            <Menu.Item name='register' active={activeItem === 'register'} onClick={this.handleItemClick}>
+              <Modal trigger={<div>Registrarse</div>}>
+                <RegisterForm />
+              </Modal>
+            </Menu.Item>
+          ) : null}
         </Menu.Menu>
       </Menu>
     )

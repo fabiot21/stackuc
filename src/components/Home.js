@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { base, fbase } from './FireBase';
+import { base, fBase } from './FireBase';
 
 class Home extends Component {
   render() {
