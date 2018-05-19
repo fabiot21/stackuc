@@ -63,7 +63,7 @@ class LoginForm extends Component {
                   </Segment>
                 </Form>
                 <Message>
-                  Eres nuevo? <a className="pointer" onClick={() => this.setState({ register: true })}>Registrarse</a>
+                  Eres nuevo? <a className="pointer" onClick={() => this.setState({ register: true })}>Registrate!</a>
               </Message>
             </Grid.Column>
           </Grid>
