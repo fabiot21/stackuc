@@ -20,3 +20,22 @@ body {
 .pointer {
   cursor: pointer;
 }
+
+.sidebar {
+  float: left;
+  min-height: 100vh;
+  min-width: 37%;
+}
+
+.right {
+  float: right;
+}
+
+.logo {
+  margin-bottom: 20px;
+}
+
+.marginSide {
+  margin-top: 40px;
+  margin-left: 15%;
+}

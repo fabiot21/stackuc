@@ -32,30 +32,31 @@ export default class Header extends Component {
 
     return (
       <Menu className="container" secondary>
-        <Menu.Item name="home" onClick={this.handleItemClick}>
-          <Image size="small" src={Logo} />
+        <Menu.Item name="home" active={activeItem === 'home'} onClick={this.handleItemClick}>
+          <Icon name='home' />
         </Menu.Item>
         <Menu.Item name='hacer pregunta' active={activeItem === 'hacer pregunta'} onClick={this.handleItemClick} />
-        <Menu.Item name='crear tutoriales' active={activeItem === 'crear tutoriales'} onClick={this.handleItemClick} />
+        <Menu.Item name='crear tutorial' active={activeItem === 'crear tutorial'} onClick={this.handleItemClick} />
         <Menu.Menu position='right'>
           <Menu.Item>
             <Input icon='search' placeholder='Buscar...' />
           </Menu.Item>
           {!this.state.activeUser? (
-              <Menu.Item name='login' active={activeItem === 'login'} onClick={this.handleItemClick}>
-                <Modal trigger={<div>Iniciar Sesión</div>}>
-                  <LoginForm />
-                </Modal>
-              </Menu.Item>
+            <Modal dimmer="blurring" trigger={
+                <Menu.Item name='Iniciar Sesión' active={activeItem === 'Iniciar Sesión'} onClick={this.handleItemClick}/>
+              }>
+              <LoginForm />
+            </Modal>
           ) : (
             <Menu.Item name='Cerrar Sesión' active={activeItem === 'Cerrar Sesión'} onClick={() => this.logout()} />
           )}
           {!this.state.activeUser? (
-            <Menu.Item name='register' active={activeItem === 'register'} onClick={this.handleItemClick}>
-              <Modal trigger={<div>Registrarse</div>}>
-                <RegisterForm />
-              </Modal>
-            </Menu.Item>
+            <Modal dimmer="blurring"
+              trigger= {
+                <Menu.Item name='register' active={activeItem === 'register'} onClick={this.handleItemClick}/>
+              }>
+              <RegisterForm />
+            </Modal>
           ) : null}
         </Menu.Menu>
       </Menu>

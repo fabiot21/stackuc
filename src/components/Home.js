@@ -4,7 +4,7 @@ import { base, fBase } from './FireBase';
 class Home extends Component {
   render() {
     return (
-      <div className="App">
+      <div className="container">
         Home
       </div>
     );
