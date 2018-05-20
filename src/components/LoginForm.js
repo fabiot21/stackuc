@@ -8,7 +8,7 @@ class LoginForm extends Component {
     super(props);
 
     this.state = {
-      register: false,
+      register: props.register,
       email: '',
       password: ''
     }
