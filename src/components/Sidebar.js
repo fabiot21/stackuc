@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import Logo from '../assets/logoWhite.png'
+import { Link } from 'react-router-dom';
 import { Sidebar, Segment, Button, Menu, Image, Icon, Header } from 'semantic-ui-react'
 
 class SidebarComponent extends Component {
@@ -15,10 +16,12 @@ class SidebarComponent extends Component {
             <Menu.Item className="logo" name="logo">
               <Image size="medium" src={Logo} />
             </Menu.Item>
-            <Menu.Item className="pointer" name='question'>
-              <Icon name='question' />
-              Preguntas
-            </Menu.Item>
+            <Link to="/preguntas">
+              <Menu.Item className="pointer" name='question'>
+                <Icon name='question' />
+                Preguntas
+              </Menu.Item>
+            </Link>
             <Menu.Item className="pointer" name='book'>
               <Icon name='book' />
               Tutoriales
