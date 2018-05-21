@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { base } from './Firebase';
 import { Label, Header,Form,Button, Comment,Loader, Divider, Rating } from 'semantic-ui-react';
 import DefaultAvatar from '../assets/default-avatar.png'
+const ReactMarkdown = require('react-markdown')
 
 class Question extends Component {
 
@@ -42,7 +43,7 @@ class Question extends Component {
         <h1> {this.state.questionData.title} </h1>
         {tags}
         <Divider />
-        <p> {this.state.questionData.content} </p>
+          <ReactMarkdown source={this.state.questionData.content} />,
         <Divider />
         <Comment.Group>
           <Header as='h2' dividing>Respuestas</Header>
