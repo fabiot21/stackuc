@@ -43,7 +43,7 @@ class Question extends Component {
         <h1> {this.state.questionData.title} </h1>
         {tags}
         <Divider />
-          <ReactMarkdown source={this.state.questionData.content} />,
+          <ReactMarkdown source={this.state.questionData.content}/>
         <Divider />
         <Comment.Group>
           <Header as='h2' dividing>Respuestas</Header>
@@ -52,9 +52,11 @@ class Question extends Component {
             <Comment.Content>
               <Comment.Author as='a'>El choro</Comment.Author>
               <Comment.Metadata>
-                <div>Today at 5:42PM</div>
+                <Rating icon='star' defaultRating={0} maxRating={5} />
               </Comment.Metadata>
-              <Comment.Text>Blablablablablablabla</Comment.Text>
+              <Comment.Text>
+                   <ReactMarkdown source={"holi x2"}/>
+              </Comment.Text>
             </Comment.Content>
           </Comment>
           <Comment>
@@ -62,9 +64,11 @@ class Question extends Component {
             <Comment.Content>
               <Comment.Author as='a'>El pulento</Comment.Author>
               <Comment.Metadata>
-                <div>Today at 5:50PM</div>
+              <Rating icon='star' defaultRating={0} maxRating={5} />
               </Comment.Metadata>
-              <Comment.Text>Está pulentoso</Comment.Text>
+              <Comment.Text>
+                <ReactMarkdown source={"holi"}/>
+              </Comment.Text>
             </Comment.Content>
           </Comment>
 
