@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import Logo from '../assets/logoWhite.png'
 import { Link } from 'react-router-dom';
-import { Sidebar, Segment, Button, Menu, Image, Icon, Header } from 'semantic-ui-react'
+import { Sidebar, Segment, Menu, Image, Icon } from 'semantic-ui-react'
 
 class SidebarComponent extends Component {
   state = { visible: true }
@@ -22,10 +22,12 @@ class SidebarComponent extends Component {
                 Preguntas
               </Menu.Item>
             </Link>
-            <Menu.Item className="pointer" name='book'>
-              <Icon name='book' />
-              Tutoriales
-            </Menu.Item>
+            <Link to="/tutoriales">
+              <Menu.Item className="pointer" name='tutorials'>
+                <Icon name='book' />
+                Tutoriales
+              </Menu.Item>
+            </Link>
             <Menu.Item className="pointer" name='tag'>
               <Icon name='tag' />
               Tags

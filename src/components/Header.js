@@ -1,15 +1,12 @@
 import React, { Component } from 'react';
 import LoginForm from './LoginForm';
-import RegisterForm from './RegisterForm';
 import NewQuestionForm from './NewQuestionForm';
-import { fLogout, auth } from './FireBase';
-import Logo from '../assets/logo.png';
+import { fLogout, auth } from './Firebase';
 import { Link } from 'react-router-dom';
-import { Input, Menu, Icon, Modal, Image } from 'semantic-ui-react'
+import { Input, Menu, Icon, Modal } from 'semantic-ui-react'
 
 export default class Header extends Component {
   state = {
-    activeItem: 'home',
     activeUser: false,
     newQuestionOpen: false
    }
@@ -29,15 +26,13 @@ export default class Header extends Component {
   }
 
   render() {
-    const { activeItem } = this.state
-
     return (
       <Menu className="container" secondary>
-        <Link to="/">
-          <Menu.Item name="home">
+        <Menu.Item name="home">
+          <Link style={{ color: "inherit" } } to="/">
             <Icon name='home' />
-          </Menu.Item>
-        </Link>
+          </Link>
+        </Menu.Item>
         <Modal
           onOpen={() => this.setState({ newQuestionOpen: true })}
           onClose={() => this.setState({ newQuestionOpen: false })}
@@ -51,7 +46,11 @@ export default class Header extends Component {
           <Modal.Header>Hacer Pregunta</Modal.Header>
           <NewQuestionForm close={() => this.setState({ newQuestionOpen: false })}/>
         </Modal>
-        <Menu.Item name='crear tutorial' />
+        <Menu.Item name="crear tutorial">
+          <Link className="item" to="/creartutorial">
+            Crear Tutorial
+          </Link>
+        </Menu.Item>
         <Menu.Menu position='right'>
           <Menu.Item>
             <Input icon='search' placeholder='Buscar...' />

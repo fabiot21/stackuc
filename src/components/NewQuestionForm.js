@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Modal, Form } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom';
-import { base, fBase } from './FireBase';
+import { base } from './Firebase';
 
 class NewQuestionForm extends Component {
   constructor(props) {
@@ -9,7 +9,8 @@ class NewQuestionForm extends Component {
 
     this.state = {
       title: '',
-      content: ''
+      content: '',
+      tags: ''
     }
   }
 
@@ -19,13 +20,19 @@ class NewQuestionForm extends Component {
       data: {
         title: this.state.title,
         content: this.state.content,
+        tags: this.state.tags,
         votes: 0,
-        rating: 0,
-        answered: false
+        points: 0,
+        answered: false,
+        answers: 0
       }
     }).then(() => {
-      this.props.history.push('/preguntas')
-      this.props.close()
+      if (this.props.location.pathname === '/preguntas') {
+        window.location.reload()
+      } else {
+        this.props.history.push('/preguntas')
+        this.props.close()
+      }
     })
   }
 
@@ -33,8 +40,7 @@ class NewQuestionForm extends Component {
     return (
         <Modal.Content>
           <Form
-            onSubmit={(e) => this.onFormSubmit(e)}
-            className="veryHeightForm">
+            onSubmit={(e) => this.onFormSubmit(e)}>
             <Form.Input
               fluid
               placeholder='Título'
@@ -47,7 +53,15 @@ class NewQuestionForm extends Component {
               value={this.state.content}
               onChange={(e) => this.setState({ content: e.target.value})}
                />
-            <Form.Button primary>Enviar</Form.Button>
+            <Form.Input
+              fluid
+              placeholder='Etiquetas (e.g: Machine Learning, Python, Big Data)'
+              value={this.state.tags}
+              onChange={(e) => this.setState({ tags: e.target.value})}
+                />
+              <Form.Button floated="right" primary>Enviar</Form.Button>
+              <br />
+              <br />
           </Form>
         </Modal.Content>
     )

@@ -1,16 +1,16 @@
 import React, { Component } from 'react';
 import NewestList from './shared/NewestList';
 
-class Questions extends Component {
+class Tutorials extends Component {
   render() {
     return (
       <div>
-        <h1>Preguntas Recientes</h1>
+        <h1>Tutoriales Recientes</h1>
         <br />
-        <NewestList data="questions"/>
+        <NewestList data="tutorials"/>
       </div>
     )
   }
 }
 
-export default Questions;
+export default Tutorials;
