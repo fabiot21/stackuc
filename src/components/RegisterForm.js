@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Modal, Button, Form, Grid, Header, Message, Segment } from 'semantic-ui-react';
-import { fRegister } from './FireBase';
+import { Modal, Button, Form, Grid, Header, Segment } from 'semantic-ui-react';
+import { fRegister } from './Firebase';
 
 class Register extends Component {
   constructor(props) {

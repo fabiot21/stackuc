@@ -1,14 +1,14 @@
 import React, { Component } from 'react'
 import Register from './RegisterForm';
-import { fLogin, auth } from './FireBase';
-import { Modal, Button, Form, Grid, Header, Image, Message, Segment } from 'semantic-ui-react'
+import { fLogin, auth } from './Firebase';
+import { Modal, Button, Form, Grid, Header, Message, Segment } from 'semantic-ui-react'
 
 class LoginForm extends Component {
   constructor(props){
     super(props);
 
     this.state = {
-      register: false,
+      register: props.register,
       email: '',
       password: ''
     }

@@ -14,6 +14,9 @@ import 'semantic-ui-css/semantic.min.css';
 
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
+import Questions from './components/Questions';
+import NewTutorialForm from './components/NewTutorialForm';
+import Tutorials from './components/Tutorials';
 
 const storeWithMiddleWare = applyMiddleware(ReduxPromise)(createStore);
 
@@ -26,6 +29,9 @@ ReactDOM.render(
         <div className="marginSide">
           <Switch>
             <Route exact path='/' component={Home}/>
+            <Route exact path='/preguntas' component={Questions}/>
+            <Route exact path='/creartutorial' component={NewTutorialForm}/>
+            <Route exact path='/tutoriales' component={Tutorials}/>
           </Switch>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import Logo from '../assets/logoWhite.png'
-import { Sidebar, Segment, Button, Menu, Image, Icon, Header } from 'semantic-ui-react'
+import { Link } from 'react-router-dom';
+import { Sidebar, Segment, Menu, Image, Icon } from 'semantic-ui-react'
 
 class SidebarComponent extends Component {
   state = { visible: true }
@@ -15,14 +16,18 @@ class SidebarComponent extends Component {
             <Menu.Item className="logo" name="logo">
               <Image size="medium" src={Logo} />
             </Menu.Item>
-            <Menu.Item className="pointer" name='question'>
-              <Icon name='question' />
-              Preguntas
-            </Menu.Item>
-            <Menu.Item className="pointer" name='book'>
-              <Icon name='book' />
-              Tutoriales
-            </Menu.Item>
+            <Link to="/preguntas">
+              <Menu.Item className="pointer" name='question'>
+                <Icon name='question' />
+                Preguntas
+              </Menu.Item>
+            </Link>
+            <Link to="/tutoriales">
+              <Menu.Item className="pointer" name='tutorials'>
+                <Icon name='book' />
+                Tutoriales
+              </Menu.Item>
+            </Link>
             <Menu.Item className="pointer" name='tag'>
               <Icon name='tag' />
               Tags
