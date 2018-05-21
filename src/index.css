@@ -12,10 +12,6 @@ body {
     display: flex !important;
 }
 
-.dimmed.dimmable > .ui.modals.dimmer.visible {
-  display: flex !important;
-}
-
 .login-form {
   margin-top: 10%;
   margin-bottom: 10%;
