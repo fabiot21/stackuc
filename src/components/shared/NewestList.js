@@ -31,25 +31,25 @@ class NewestList extends Component {
         <Loader active inline='centered' />
       )
     }
-    const list = this.state.list.slice((this.state.activePage - 1)*6, this.state.activePage*6).map(question => {
-      const tags = question.tags.split(',').map((tag, idx) => {
+    const list = this.state.list.slice((this.state.activePage - 1)*6, this.state.activePage*6).map(element => {
+      const tags = element.tags.split(',').map((tag, idx) => {
         return (
           <Label key={idx} disabled={true}>{tag}</Label>
         )
       })
       return (
-        <Item key={question.key}>
+        <Item key={element.key}>
           <Item.Content>
-            <Item.Header as='a'>{question.title}</Item.Header>
-            <Item.Description>{question.content.slice(0, 120)} ...</Item.Description>
+            <Item.Header as='a'>{element.title}</Item.Header>
+            <Item.Description>{element.content.slice(0, 120)} ...</Item.Description>
             <Item.Extra>{tags}</Item.Extra>
           </Item.Content>
           <Statistic.Group size='mini'>
             <Statistic>
-              <Statistic.Value><Icon name='comments' /> {question.answers}</Statistic.Value>
+              <Statistic.Value><Icon name='comments' /> {this.props.data === 'questions'? element.answers : element.comments}</Statistic.Value>
             </Statistic>
             <Statistic>
-              <Statistic.Value><Icon name='star' /> {question.votes !== 0? Math.round(question.points/question.votes) : 0}</Statistic.Value>
+              <Statistic.Value><Icon name='star' /> {element.votes !== 0? Math.round(element.points/element.votes) : 0}</Statistic.Value>
             </Statistic>
           </Statistic.Group>
 
