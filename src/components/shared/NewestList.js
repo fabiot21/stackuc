@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { base } from '../Firebase';
 import { Container, Pagination, Icon, Statistic, Loader, Item, Label } from 'semantic-ui-react';
+import { withRouter } from 'react-router-dom';
 
 class NewestList extends Component {
   constructor(props) {
@@ -11,7 +12,19 @@ class NewestList extends Component {
       activePage: 1,
       totalPages: 1
     }
+    this.redirectTo = this.redirectTo.bind(this);
   }
+
+  redirectTo(item){
+    console.log(item)
+    if(this.props.data==='questions'){
+      this.props.history.push('preguntas/' + item.key + '/' + item.title)
+    }
+    else{
+      this.props.history.push('tutoriales/' + item.key + '/' + item.title)
+    }
+    }
+
   componentDidMount() {
     base.fetch(this.props.data, {
     context: this,
@@ -39,7 +52,7 @@ class NewestList extends Component {
       })
       return (
         <Item key={element.key}>
-          <Item.Content>
+          <Item.Content onClick={()=>this.redirectTo(element)}>
             <Item.Header as='a'>{element.title}</Item.Header>
             <Item.Description>{element.content.slice(0, 120)} ...</Item.Description>
             <Item.Extra>{tags}</Item.Extra>
@@ -69,4 +82,4 @@ class NewestList extends Component {
   }
 }
 
-export default NewestList;
+export default withRouter(NewestList);
