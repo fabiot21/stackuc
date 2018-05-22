@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { base } from './Firebase';
-import { Segment, Label, Header,Form,Button, Comment,Loader, Divider, Rating } from 'semantic-ui-react';
+import { Icon, Segment, Label, Header,Form,Button, Comment,Loader, Divider, Rating } from 'semantic-ui-react';
 import DefaultAvatar from '../assets/default-avatar.png'
 import { auth } from './Firebase'
 
@@ -17,6 +17,11 @@ class Question extends Component {
   }
 
   componentDidMount(){
+    this.fetchQuestions()
+    this.bindAnswers()
+  }
+
+  fetchQuestions = ()=>{
     base.fetch('questions/' + this.state.questionId, {
     context: this,
     asArray: false,
@@ -24,22 +29,19 @@ class Question extends Component {
       this.setState({questionData: data})
     }
       });
-      this.fetchAnswers()
   }
 
-  fetchAnswers = () =>
+  bindAnswers = () =>
       base.bindToState('answers/' + this.state.questionId, {
       context: this,
       state: 'answersData',
       asArray: false
       });
-    /*base.fetch('answers/' + this.state.questionId,{
-          context: this,
-          asArray: false,  //No pido array porque necesito el id de cada comentario (para los likes)
-          then(data){
-            this.setState({answersData: data})
-          }
-        });*/
+
+  deleteAnswer = (commentKey) => {
+    base.remove('answers/'+this.state.questionId+'/'+commentKey);
+    //Falta manejar errores acá
+  }
 
 
   handleChange = (e, {name,value}) => this.setState({'answer' : value})
@@ -55,6 +57,15 @@ class Question extends Component {
       document.getElementById('field_answer').value = ''
         };
 
+  renderDelete = (comment,commentKey) =>{
+    if(comment.userEmail === auth.currentUser.email){
+      return(
+            <Button icon size='tiny' circular onClick={() => this.deleteAnswer(commentKey)} >
+            <Icon color = 'red' name='delete' size='large'/>
+            </Button>
+      )}
+  }
+
   renderCommentGroup = () => {
     if (!this.state.answersData) {
       return (
@@ -62,7 +73,7 @@ class Question extends Component {
       )
     }
     const comments = Object.keys(this.state.answersData).map((key, index) => (
-      this.renderComment(this.state.answersData[key])
+      this.renderComment(this.state.answersData[key],key)
     ));
 
     return(
@@ -78,16 +89,16 @@ class Question extends Component {
     )
   }
 
-  renderComment = (comment) => {
-      console.log(comment)
+  renderComment = (comment,commentKey) => {
       return(
         <Segment>
           <Comment>
             <Comment.Avatar src={DefaultAvatar}/>
             <Comment.Content>
-              <Comment.Author as='a'>{comment.userEmail}</Comment.Author>
+              <Comment.Author as='a'>{comment.userEmai}</Comment.Author>
               <Comment.Metadata>
                 <Rating icon='star' defaultRating={0} maxRating={5} />
+                {this.renderDelete(comment,commentKey)}
               </Comment.Metadata>
               <Comment.Text>
                 <ReactMarkdown source={comment.content}/>
@@ -120,9 +131,6 @@ class Question extends Component {
           <ReactMarkdown source={this.state.questionData.content}/>
         </Segment>
         {this.renderCommentGroup()}
-
-
-
       </div>
     );
   }
