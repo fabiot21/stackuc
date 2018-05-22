@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { base } from './Firebase';
-import { Icon, Segment, Label, Header,Form,Button, Comment,Loader, Divider, Rating } from 'semantic-ui-react';
+import { Confirm, Icon, Segment, Label, Header,Form,Button, Comment,Loader, Divider, Rating } from 'semantic-ui-react';
 import DefaultAvatar from '../assets/default-avatar.png'
 import { auth } from './Firebase'
 
@@ -13,6 +13,7 @@ class Question extends Component {
     this.state= {
       questionId: this.props.match.params.preguntaid,
       questionTitle: this.props.match.params.titulopregunta,
+      confirmDialogOpen: false,
     }
   }
 
@@ -64,7 +65,18 @@ class Question extends Component {
   renderDelete = (comment,commentKey) =>{
     if(comment.userEmail === auth.currentUser.email){
       return(
-            <Button icon size='tiny' circular onClick={() => this.deleteAnswer(commentKey)} >
+            <Button icon size='tiny' circular onClick={() => this.setState({confirmDialogOpen: true})} >
+            <Confirm
+              cancelButton = 'Cancelar'
+              confirmButton = 'Si'
+              content = '¿Estás seguro de borrar esta respuesta?'
+              open={this.state.confirmDialogOpen}
+              onCancel={() => this.setState({confirmDialogOpen: false})}
+              onConfirm={()=>{
+                this.setState({confirmDialogOpen: false}) ;
+                this.deleteAnswer(commentKey) }}
+            />
+
             <Icon color = 'red' name='delete' size='large'/>
             </Button>
       )}
