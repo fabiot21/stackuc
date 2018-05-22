@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { base } from './Firebase';
-import { Label, Header,Form,Button, Comment,Loader, Divider, Rating } from 'semantic-ui-react';
+import { Segment, Label, Header,Form,Button, Comment,Loader, Divider, Rating } from 'semantic-ui-react';
 import DefaultAvatar from '../assets/default-avatar.png'
 import { auth } from './Firebase'
 
@@ -81,18 +81,20 @@ class Question extends Component {
   renderComment = (comment) => {
       console.log(comment)
       return(
-        <Comment>
-          <Comment.Avatar src={DefaultAvatar}/>
-          <Comment.Content>
-            <Comment.Author as='a'>{comment.userEmail}</Comment.Author>
-            <Comment.Metadata>
-              <Rating icon='star' defaultRating={0} maxRating={5} />
-            </Comment.Metadata>
-            <Comment.Text>
-                 <ReactMarkdown source={comment.content}/>
-            </Comment.Text>
-          </Comment.Content>
-        </Comment>
+        <Segment>
+          <Comment>
+            <Comment.Avatar src={DefaultAvatar}/>
+            <Comment.Content>
+              <Comment.Author as='a'>{comment.userEmail}</Comment.Author>
+              <Comment.Metadata>
+                <Rating icon='star' defaultRating={0} maxRating={5} />
+              </Comment.Metadata>
+              <Comment.Text>
+                <ReactMarkdown source={comment.content}/>
+              </Comment.Text>
+            </Comment.Content>
+          </Comment>
+        </Segment>
       )
   }
 
@@ -114,9 +116,9 @@ class Question extends Component {
         <Rating className = 'right' icon='star' defaultRating={0} maxRating={5} />
         <h1> {this.state.questionData.title} </h1>
         {tags}
-        <Divider />
+        <Segment>
           <ReactMarkdown source={this.state.questionData.content}/>
-        <Divider />
+        </Segment>
         {this.renderCommentGroup()}
 
 
