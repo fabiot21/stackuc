@@ -46,7 +46,11 @@ class Question extends Component {
 
   handleChange = (e, {name,value}) => this.setState({'answer' : value})
 
-  handleSubmit = () => {    base.push('answers/'+this.state.questionId, {
+  handleSubmit = () => {
+        if(!this.state.answer || this.state.answer===''){
+          return
+        }
+        base.push('answers/'+this.state.questionId, {
         data: {
           userEmail: auth.currentUser.email,
           content: this.state.answer,
