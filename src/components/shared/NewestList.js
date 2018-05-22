@@ -17,12 +17,12 @@ class NewestList extends Component {
 
   redirectTo(item){
     if(this.props.data==='questions'){
-      this.props.history.push('preguntas/' + item.key + '/' + item.title)
+      this.props.history.push('preguntas/' + item.key + '/' + item.title.replace(/ /g, '-'))
     }
     else{
-      this.props.history.push('tutoriales/' + item.key + '/' + item.title)
+      this.props.history.push('tutoriales/' + item.key + '/' + item.title.replace(/ /g, '-'))
     }
-    }
+  }
 
   componentDidMount() {
     base.fetch(this.props.data, {
