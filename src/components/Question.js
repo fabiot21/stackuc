@@ -14,12 +14,34 @@ class Question extends Component {
       questionId: this.props.match.params.preguntaid,
       questionTitle: this.props.match.params.titulopregunta,
       confirmDialogOpen: false,
+      questionRating: 0
     }
   }
 
   componentDidMount(){
     this.fetchQuestions()
     this.bindAnswers()
+    this.handleAuthStateChange()
+  }
+
+  handleAuthStateChange(){
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+      }
+      this.fetchPreviousRating() //Si se hace la request antes de que se obtenga la data del usuario asincronamente crashea, asi que lo hago cuando llegue la data
+    })
+  }
+
+  fetchPreviousRating = ()=>{
+    console.log('ratings/questions' + this.state.questionId + '/users/' + auth.currentUser.uid)
+    base.fetch('ratings/questions/' + this.state.questionId+'/users/' + auth.currentUser.uid ,{
+    context: this,
+    asArray: false,
+    then(data){
+      console.log("DATAAA", data.rating)
+      this.setState({questionRating: data.rating})
+    }
+      });
   }
 
   fetchQuestions = ()=>{
@@ -44,6 +66,15 @@ class Question extends Component {
     //Falta manejar errores acá
   }
 
+  handleQuestionRating = (e,{ rating, maxRating} ) =>{
+    this.setState({questionRating: rating})
+    base.post('ratings/questions/'+this.state.questionId+'/users/'+auth.currentUser.uid, {
+      data: {
+        userEmail : auth.currentUser.email,
+        rating: rating
+            }
+    })
+  }
 
   handleChange = (e, {name,value}) => this.setState({'answer' : value})
 
@@ -100,7 +131,6 @@ class Question extends Component {
         <Form.TextArea id='field_answer' name='answer' onChange= {this.handleChange}/>
         <Form.Button content='Agrega una respuesta' labelPosition='left' icon='edit' primary />
       </Form>
-
     </Comment.Group>
     )
   }
@@ -140,7 +170,7 @@ class Question extends Component {
 
     return (
       <div className="container">
-        <Rating className = 'right' icon='star' defaultRating={0} maxRating={5} />
+        <Rating className = 'right' icon='star' defaultRating={0} rating={this.state.questionRating} maxRating={5} onRate={this.handleQuestionRating} />
         <h1> {this.state.questionData.title} </h1>
         {tags}
         <Segment>
