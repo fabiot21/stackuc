@@ -17,7 +17,6 @@ class Register extends Component {
     fRegister(this.state.email, this.state.password)
       .then((data) => {
         this.props.registerSuccess()
-        console.log(data)
       });
   }
 

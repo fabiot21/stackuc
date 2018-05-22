@@ -16,7 +16,6 @@ class NewestList extends Component {
   }
 
   redirectTo(item){
-    console.log(item)
     if(this.props.data==='questions'){
       this.props.history.push('preguntas/' + item.key + '/' + item.title)
     }
@@ -30,7 +29,6 @@ class NewestList extends Component {
     context: this,
     asArray: true,
     then(data){
-      console.log(data);
       this.setState({ list: data.reverse() })
       this.setState({ totalPages: Math.trunc((data.length - 1) / 6) + 1 })
     }
