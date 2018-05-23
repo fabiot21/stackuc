@@ -17,14 +17,25 @@ class Question extends Component {
       answerInput: '',
       answersData: [],
       confirmDialogOpen: false,
-      hasVoted: false
+      hasVoted: false,
+      answerRatings: {},
     }
   }
 
   componentDidMount() {
     this.fetchQuestionRating();
     this.fetchQuestionData();
+    this.handleAuthStateChange();
     this.bindAnswers();
+  }
+
+
+  handleAuthStateChange(){
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        this.fetchAnswerRatings() //Si se hace la request antes de que se obtenga la data del usuario asincronamente crashea, asi que lo hago cuando llegue la data
+      }
+    })
   }
 
   fetchQuestionData() {
@@ -50,12 +61,9 @@ class Question extends Component {
         }
       }
     });
-
-
     if (!auth.currentUser) {
       return false
     }
-
     base.fetch(`ratings/questions/${this.state.questionId}/users/${auth.currentUser.uid}`, {
       context: this,
       asArray: false,
@@ -65,6 +73,16 @@ class Question extends Component {
         }
 
       }
+    });
+  }
+
+  fetchAnswerRatings(){
+    base.fetch('ratings/questions/' + this.state.questionId+'/users/' + auth.currentUser.uid +'/answers/',{
+    context: this,
+    asArray: false,
+    then(data){
+      this.setState({answerRatings: data})
+    }
     });
   }
 
@@ -144,6 +162,19 @@ class Question extends Component {
     });
   }
 
+  handleAnswerRating(e,ratingObject ){
+    console.log(ratingObject)
+  var newState = Object.assign({}, this.state)
+  newState.answerRatings[ratingObject.answerkey] = {rating: ratingObject.rating}
+  this.setState(newState)
+  base.post('ratings/questions/' + this.state.questionId + '/users/'+auth.currentUser.uid + '/answers/'+ratingObject.answerkey, {
+    data: {
+      userEmail : auth.currentUser.email,
+      rating: ratingObject.rating
+          }
+  })
+  }
+
   renderCommentGroup() {
     var COMMENTS;
     if (this.state.answersData.length === 0) {
@@ -160,7 +191,7 @@ class Question extends Component {
               {(this.state.answerRatings) && this.state.answerRatings[answer.key]?(
              <Rating icon='star' answerkey={answer.key} rating = {this.state.answerRatings[answer.key].rating} maxRating={5} onRate= {(e,ratingObject)=> {this.handleAnswerRating(e,ratingObject)}}/>
            ):(
-             <Rating icon='star' commentkey={answer.key} rating = {0} maxRating={5} onRate= {(e,ratingObject)=> {this.handleAnswerRating(e,ratingObject)}}/>
+             <Rating icon='star' answerkey={answer.key} rating = {0} maxRating={5} onRate= {(e,ratingObject)=> {this.handleAnswerRating(e,ratingObject)}}/>
            )}
               <Comment.Content>
                 <Comment.Author as='a'>{answer.userEmail}</Comment.Author>
