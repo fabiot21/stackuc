@@ -106,9 +106,12 @@ class Tutorial extends Component {
           open={this.state.confirmDialogOpen}
           onCancel={() => this.setState({confirmDialogOpen: false})}
           onConfirm={() => {
-            this.setState({confirmDialogOpen: false}) ;
-            base.remove(`comments/${this.state.tutorialId}/${key}`)
-
+            fBase.database().ref(`tutorials/${this.state.tutorialId}/comments`).transaction((i) => {
+              return i - 1;
+            }).then(() => {
+              this.setState({confirmDialogOpen: false}) ;
+              base.remove(`comments/${this.state.tutorialId}/${key}`)
+            });
           }}
         />
 
