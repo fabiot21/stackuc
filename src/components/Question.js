@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { base } from './Firebase';
-import { Confirm, Icon, Segment, Label, Header,Form,Button, Comment,Loader, Divider, Rating } from 'semantic-ui-react';
+import { Confirm, Icon, Segment, Label, Header,Form,Button, Comment,Loader, Rating } from 'semantic-ui-react';
 import DefaultAvatar from '../assets/default-avatar.png'
 import { auth } from './Firebase'
 
@@ -177,7 +177,7 @@ class Question extends Component {
     })
   }
 
-  handleAnswerRating = (e,ratingObject ) =>{
+  handleAnswerRating = (e,ratingObject ) => {
     var newState = Object.assign({}, this.state)
     newState.answerRatings[ratingObject.commentkey] = {rating: ratingObject.rating}
     this.setState(newState)
