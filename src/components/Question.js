@@ -51,6 +51,7 @@ class Question extends Component {
       }
     });
 
+
     if (!auth.currentUser) {
       return false
     }
@@ -119,12 +120,12 @@ class Question extends Component {
     )
   }
 
-  submitRating(e, { rating }) {
+  submitQuestionRating(e, { rating }) {
     if (!auth.currentUser) {
       return false
     }
     fBase.database().ref().transaction(root => {
-      if (root && root.questions && root.ratings && auth.currentUser) {
+      if (root && root.questions && auth.currentUser) {
         if (this.state.hasVoted) {
           root.questions[this.state.questionId].votes -= 1
           root.questions[this.state.questionId].points -= this.state.personalRating
@@ -156,6 +157,11 @@ class Question extends Component {
               <div className="right pointer">
                 {auth.currentUser && answer.userEmail === auth.currentUser.email? this.renderDeleteButton(answer.key) : null}
               </div>
+              {(this.state.answerRatings) && this.state.answerRatings[answer.key]?(
+             <Rating icon='star' answerkey={answer.key} rating = {this.state.answerRatings[answer.key].rating} maxRating={5} onRate= {(e,ratingObject)=> {this.handleAnswerRating(e,ratingObject)}}/>
+           ):(
+             <Rating icon='star' commentkey={answer.key} rating = {0} maxRating={5} onRate= {(e,ratingObject)=> {this.handleAnswerRating(e,ratingObject)}}/>
+           )}
               <Comment.Content>
                 <Comment.Author as='a'>{answer.userEmail}</Comment.Author>
                 <Comment.Text>
@@ -167,6 +173,7 @@ class Question extends Component {
         )
       })
     }
+
     return (
       <Comment.Group>
         <Header as='h2' dividing>Comentarios</Header>
@@ -202,7 +209,7 @@ class Question extends Component {
           <Statistic.Value><Icon name='star' /> {this.state.questionRating}</Statistic.Value>
         </Statistic>
         <h1> {this.state.questionData.title} </h1>
-        <Rating icon='star' rating={this.state.personalRating} maxRating={5} onRate={(e, values) => this.submitRating(e, values)} />
+        <Rating icon='star' rating={this.state.personalRating} maxRating={5} onRate={(e, values) => this.submitQuestionRating(e, values)} />
         <br />
         <br />
         {tags}
