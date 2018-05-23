@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Statistic, Confirm, Icon, Segment, Label, Header,Form, Comment,Loader, Rating } from 'semantic-ui-react';
+import { Grid,Statistic, Confirm, Icon, Segment, Label, Header,Form, Comment,Loader, Rating } from 'semantic-ui-react';
 import ReactMarkdown from 'react-markdown';
 import { base, fBase } from './Firebase';
 import { auth } from './Firebase'
@@ -71,7 +71,6 @@ class Question extends Component {
         if (data.rating) {
           this.setState({ hasVoted: true, personalRating: data.rating })
         }
-
       }
     });
   }
@@ -94,7 +93,9 @@ class Question extends Component {
     base.push(`answers/${this.state.questionId}`, {
       data: {
         userEmail: auth.currentUser.email,
-        content: this.state.answerInput
+        content: this.state.answerInput,
+        votes: 0,
+        points: 0,
       }
     }).then(() => {
       fBase.database().ref(`questions/${this.state.questionId}/answers`).transaction((i) => {
@@ -162,23 +163,43 @@ class Question extends Component {
     });
   }
 
+  checkIfUserRatedAnswer(answerKey){
+    console.log(this.state.answerRatings[answerKey])
+    console.log(!(!this.state.asnwerRatings || !this.state.answerRatings[answerKey]))
+    return !(!this.state.answerRatings || !this.state.answerRatings[answerKey]);
+  }
+
   handleAnswerRating(e,ratingObject ){
-    console.log(ratingObject)
-  var newState = Object.assign({}, this.state)
-  newState.answerRatings[ratingObject.answerkey] = {rating: ratingObject.rating}
-  this.setState(newState)
-  base.post('ratings/questions/' + this.state.questionId + '/users/'+auth.currentUser.uid + '/answers/'+ratingObject.answerkey, {
-    data: {
-      userEmail : auth.currentUser.email,
-      rating: ratingObject.rating
-          }
-  })
+    if (!auth.currentUser) {
+      return false
+    }
+    fBase.database().ref().transaction(root => {
+      if (root && root.answers && auth.currentUser) {
+        if (this.checkIfUserRatedAnswer(ratingObject.answerkey)) {
+          root.answers[this.state.questionId][ratingObject.answerkey].votes -= 1
+          root.answers[this.state.questionId][ratingObject.answerkey].points -= this.state.answerRatings[ratingObject.answerkey].rating
+        }
+        root.answers[this.state.questionId][ratingObject.answerkey].votes += 1
+        root.answers[this.state.questionId][ratingObject.answerkey].points += ratingObject.rating
+      }
+      return root;
+    }).then(() => {
+      var newState = Object.assign({}, this.state)
+      newState.answerRatings[ratingObject.answerkey] = {rating: ratingObject.rating}
+      this.setState(newState)
+      base.post('ratings/questions/' + this.state.questionId + '/users/'+auth.currentUser.uid + '/answers/'+ratingObject.answerkey, {
+        data: {
+          userEmail : auth.currentUser.email,
+          rating: ratingObject.rating
+              }
+      })
+    })
   }
 
   renderCommentGroup() {
     var COMMENTS;
     if (this.state.answersData.length === 0) {
-      COMMENTS = (<div>No hay comentarios</div>)
+      COMMENTS = (<div>No hay respuestas</div>)
     } else {
       COMMENTS = this.state.answersData.map(answer => {
         return (
@@ -188,11 +209,21 @@ class Question extends Component {
               <div className="right pointer">
                 {auth.currentUser && answer.userEmail === auth.currentUser.email? this.renderDeleteButton(answer.key) : null}
               </div>
-              {(this.state.answerRatings) && this.state.answerRatings[answer.key]?(
-             <Rating icon='star' answerkey={answer.key} rating = {this.state.answerRatings[answer.key].rating} maxRating={5} onRate= {(e,ratingObject)=> {this.handleAnswerRating(e,ratingObject)}}/>
-           ):(
-             <Rating icon='star' answerkey={answer.key} rating = {0} maxRating={5} onRate= {(e,ratingObject)=> {this.handleAnswerRating(e,ratingObject)}}/>
-           )}
+
+              <Grid>
+              <Grid.Column key={1}>
+                  <Statistic.Value><Icon name='star' /> {answer.votes===0? '-' : Math.round(answer.points/answer.votes)}</Statistic.Value>
+              </Grid.Column>
+
+                <Grid.Column key={2}>
+                  {(this.state.answerRatings) && this.state.answerRatings[answer.key]?(
+                    <Rating icon='star' answerkey={answer.key} rating = {this.state.answerRatings[answer.key].rating} maxRating={5} onRate= {(e,ratingObject)=> {this.handleAnswerRating(e,ratingObject)}}/>
+                  ):(
+                    <Rating icon='star' answerkey={answer.key} rating = {0} maxRating={5} onRate= {(e,ratingObject)=> {this.handleAnswerRating(e,ratingObject)}}/>
+                      )}
+                </Grid.Column>
+              </Grid>
+
               <Comment.Content>
                 <Comment.Author as='a'>{answer.userEmail}</Comment.Author>
                 <Comment.Text>
@@ -207,14 +238,14 @@ class Question extends Component {
 
     return (
       <Comment.Group>
-        <Header as='h2' dividing>Comentarios</Header>
+        <Header as='h2' dividing>Respuestas</Header>
         {COMMENTS}
         {auth.currentUser? (
           <Form reply onSubmit={() => this.handleSubmit()}>
             <Form.TextArea id='field_answer' name='answer' value={this.state.answerInput} onChange={(e) => this.setState({ answerInput: e.target.value })}/>
             <Form.Button content='Agregar Comentario' labelPosition='left' icon='edit' primary />
           </Form>
-        ) : (<div>Debes estar logueado para comentar</div>)}
+        ) : (<div>Debes estar logueado para responder</div>)}
 
       </Comment.Group>
     )
