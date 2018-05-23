@@ -125,7 +125,7 @@ class Tutorial extends Component {
       return false
     }
     fBase.database().ref().transaction(root => {
-      if (root && root.tutorials && root.ratings && auth.currentUser) {
+      if (root && root.tutorials && auth.currentUser) {
         if (this.state.hasVoted) {
           root.tutorials[this.state.tutorialId].votes -= 1
           root.tutorials[this.state.tutorialId].points -= this.state.personalRating

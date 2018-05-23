@@ -1,192 +1,254 @@
 import React, { Component } from 'react';
-import { base } from './Firebase';
-import { Confirm, Icon, Segment, Label, Header,Form,Button, Comment,Loader, Rating } from 'semantic-ui-react';
-import DefaultAvatar from '../assets/default-avatar.png'
+import { Grid,Statistic, Confirm, Icon, Segment, Label, Header,Form, Comment,Loader, Rating } from 'semantic-ui-react';
+import ReactMarkdown from 'react-markdown';
+import { base, fBase } from './Firebase';
 import { auth } from './Firebase'
 
-const ReactMarkdown = require('react-markdown')
+import DefaultAvatar from '../assets/default-avatar.png'
 
 class Question extends Component {
+  constructor(props) {
+    super(props);
 
-  constructor(props){
-    super(props)
-    this.state= {
+    this.state = {
       questionId: this.props.match.params.preguntaid,
-      questionTitle: this.props.match.params.titulopregunta,
-      confirmDialogOpen: false,
       questionRating: 0,
+      personalRating: 0,
+      answerInput: '',
+      answersData: [],
+      confirmDialogOpen: false,
+      hasVoted: false,
+      answerRatings: {},
     }
   }
 
-  componentDidMount(){
-    this.fetchQuestions()
-    this.bindAnswers()
-    this.handleAuthStateChange()
+  componentDidMount() {
+    this.fetchQuestionRating();
+    this.fetchQuestionData();
+    this.handleAuthStateChange();
+    this.bindAnswers();
   }
+
 
   handleAuthStateChange(){
     auth.onAuthStateChanged((user) => {
       if (user) {
+        this.fetchAnswerRatings() //Si se hace la request antes de que se obtenga la data del usuario asincronamente crashea, asi que lo hago cuando llegue la data
       }
-      this.fetchPreviousRatings() //Si se hace la request antes de que se obtenga la data del usuario asincronamente crashea, asi que lo hago cuando llegue la data
     })
   }
 
-  fetchPreviousRatings = ()=>{
-    //Ratings de pregunta
-    base.fetch('ratings/questions/' + this.state.questionId+'/users/' + auth.currentUser.uid ,{
-    context: this,
-    asArray: false,
-    then(data){
-      this.setState({questionRating: data.rating})
+  fetchQuestionData() {
+    base.fetch('questions/' + this.state.questionId, {
+      context: this,
+      asArray: false,
+      then(data){
+        this.setState({ questionData: data })
+        fBase.database().ref(`questions/${this.state.questionId}/views`).transaction((i) => {
+          return i + 1;
+        });
+      }
+    });
+  }
+
+  fetchQuestionRating() {
+    base.fetch('questions/' + this.state.questionId, {
+      context: this,
+      asArray: false,
+      then(data){
+        if (data.votes !== 0) {
+          this.setState({ questionRating: Math.round(data.points/data.votes) })
+        }
+      }
+    });
+    if (!auth.currentUser) {
+      return false
     }
-      });
-    //Ratings de respuesta
+    base.fetch(`ratings/questions/${this.state.questionId}/users/${auth.currentUser.uid}`, {
+      context: this,
+      asArray: false,
+      then(data){
+        if (data.rating) {
+          this.setState({ hasVoted: true, personalRating: data.rating })
+        }
+      }
+    });
+  }
+
+  fetchAnswerRatings(){
     base.fetch('ratings/questions/' + this.state.questionId+'/users/' + auth.currentUser.uid +'/answers/',{
     context: this,
     asArray: false,
     then(data){
       this.setState({answerRatings: data})
-      for(var key in data){
-        if(data.hasOwnProperty(key)){
-          const answer = document.querySelector('[commentkey='+key+']');
-          answer.rating = data[key].rating
-        }
+    }
+    });
+  }
+
+  handleSubmit() {
+    if (this.state.answerInput === ''){
+      return
+    }
+
+    base.push(`answers/${this.state.questionId}`, {
+      data: {
+        userEmail: auth.currentUser.email,
+        content: this.state.answerInput,
+        votes: 0,
+        points: 0,
       }
-    }
-  });
-
-
-
-
-  }
-
-  fetchQuestions = ()=>{
-    base.fetch('questions/' + this.state.questionId, {
-    context: this,
-    asArray: false,
-    then(data){
-      this.setState({questionData: data})
-    }
+    }).then(() => {
+      fBase.database().ref(`questions/${this.state.questionId}/answers`).transaction((i) => {
+        return i + 1;
       });
+    })
+    this.setState({ answerInput: '' })
   }
 
-  bindAnswers = () =>
-      base.bindToState('answers/' + this.state.questionId, {
+  bindAnswers() {
+    base.bindToState('answers/' + this.state.questionId, {
       context: this,
       state: 'answersData',
-      asArray: false
-      });
+      asArray: true
+    })
 
-  deleteAnswer = (commentKey) => {
-    base.remove('answers/'+this.state.questionId+'/'+commentKey);
-    //Falta manejar errores acá
   }
 
-  handleChange = (e, {name,value}) => this.setState({'answer' : value})
+  renderDeleteButton(key) {
+    return (
+      <div onClick={() => this.setState({confirmDialogOpen: true})} >
+        <Confirm
+          dimmer="blurring"
+          cancelButton = 'Cancelar'
+          confirmButton = 'Si'
+          content = '¿Estás seguro de borrar esta respuesta?'
+          open={this.state.confirmDialogOpen}
+          onCancel={() => this.setState({confirmDialogOpen: false})}
+          onConfirm={() => {
+            fBase.database().ref(`questions/${this.state.questionId}/answers`).transaction((i) => {
+              return i - 1;
+            }).then(() => {
+              this.setState({confirmDialogOpen: false}) ;
+              base.remove(`answers/${this.state.questionId}/${key}`)
+            });
+          }}
+        />
 
-  handleSubmit = () => {
-        if(!this.state.answer || this.state.answer===''){
-          return
-        }
-        base.push('answers/'+this.state.questionId, {
-        data: {
-          userEmail: auth.currentUser.email,
-          content: this.state.answer,
-          votes: 0,
-          points: 0,
-        }
-      })
-      document.getElementById('field_answer').value = ''
-        };
-
-  renderDeleteButton = (comment,commentKey) =>{
-    if(comment.userEmail === auth.currentUser.email){
-      return(
-            <Button icon size='tiny' circular onClick={() => this.setState({confirmDialogOpen: true})} >
-            <Confirm
-              cancelButton = 'Cancelar'
-              confirmButton = 'Si'
-              content = '¿Estás seguro de borrar esta respuesta?'
-              open={this.state.confirmDialogOpen}
-              onCancel={() => this.setState({confirmDialogOpen: false})}
-              onConfirm={()=>{
-                this.setState({confirmDialogOpen: false}) ;
-                this.deleteAnswer(commentKey) }}
-            />
-
-            <Icon color = 'red' name='delete' size='large'/>
-            </Button>
-      )}
-  }
-
-  renderCommentGroup = () => {
-    if (!this.state.answersData || !this.state.answerRatings) {
-      return (
-        <Loader active inline='centered' />
-      )
-    }
-    const comments = Object.keys(this.state.answersData).map((key, index) => (
-      this.renderComment(this.state.answersData[key],key)
-    ));
-
-    return(
-    <Comment.Group>
-      <Header as='h2' dividing>Respuestas</Header>
-      {comments}
-      <Form reply onSubmit={this.handleSubmit}>
-        <Form.TextArea id='field_answer' name='answer' onChange= {this.handleChange}/>
-        <Form.Button content='Agrega una respuesta' labelPosition='left' icon='edit' primary />
-      </Form>
-    </Comment.Group>
+        <Icon color='red' name='delete' size='large'/>
+      </div>
     )
   }
 
-  renderComment = (comment,commentKey) => {
-      if(!this.state.answerRatings[commentKey]){
-        var newState = Object.assign({}, this.state)
-        newState.answerRatings[commentKey] = {rating: 0}
-        this.setState(newState)
+  submitQuestionRating(e, { rating }) {
+    if (!auth.currentUser) {
+      return false
+    }
+    fBase.database().ref().transaction(root => {
+      if (root && root.questions && auth.currentUser) {
+        if (this.state.hasVoted) {
+          root.questions[this.state.questionId].votes -= 1
+          root.questions[this.state.questionId].points -= this.state.personalRating
+        }
+        root.questions[this.state.questionId].votes += 1
+        root.questions[this.state.questionId].points += rating
       }
-      return(
-        <Segment>
-          <Comment>
-            <Comment.Avatar src={DefaultAvatar}/>
-            <Comment.Content>
-              <Comment.Author as='a'>{comment.userEmail}</Comment.Author>
-              <Comment.Metadata>
-                <Rating icon='star' commentkey={commentKey} rating = {this.state.answerRatings[commentKey].rating}  maxRating={5} onRate= {(e,ratingObject)=> {this.handleAnswerRating(e,ratingObject)}}/>
-                {this.renderDeleteButton(comment,commentKey)}
-              </Comment.Metadata>
-              <Comment.Text>
-                <ReactMarkdown source={comment.content}/>
-              </Comment.Text>
-            </Comment.Content>
-          </Comment>
-        </Segment>
-      )
+      return root;
+    }).then(() => {
+      base.update(`ratings/questions/${this.state.questionId}/users/${auth.currentUser.uid}`, {
+        data: {
+          rating: rating,
+          userEmail: auth.currentUser.email
+        }
+      }).then(() => this.fetchQuestionRating())
+    });
   }
 
-  handleQuestionRating = (e,{ rating, maxRating}) =>{
-    this.setState({questionRating: rating})
-    base.update('ratings/questions/'+this.state.questionId+'/users/'+auth.currentUser.uid, {
-      data: {
-        userEmail : auth.currentUser.email,
-        rating: rating
-            }
+  checkIfUserRatedAnswer(answerKey){
+    console.log(this.state.answerRatings[answerKey])
+    console.log(!(!this.state.asnwerRatings || !this.state.answerRatings[answerKey]))
+    return !(!this.state.answerRatings || !this.state.answerRatings[answerKey]);
+  }
+
+  handleAnswerRating(e,ratingObject ){
+    if (!auth.currentUser) {
+      return false
+    }
+    fBase.database().ref().transaction(root => {
+      if (root && root.answers && auth.currentUser) {
+        if (this.checkIfUserRatedAnswer(ratingObject.answerkey)) {
+          root.answers[this.state.questionId][ratingObject.answerkey].votes -= 1
+          root.answers[this.state.questionId][ratingObject.answerkey].points -= this.state.answerRatings[ratingObject.answerkey].rating
+        }
+        root.answers[this.state.questionId][ratingObject.answerkey].votes += 1
+        root.answers[this.state.questionId][ratingObject.answerkey].points += ratingObject.rating
+      }
+      return root;
+    }).then(() => {
+      var newState = Object.assign({}, this.state)
+      newState.answerRatings[ratingObject.answerkey] = {rating: ratingObject.rating}
+      this.setState(newState)
+      base.post('ratings/questions/' + this.state.questionId + '/users/'+auth.currentUser.uid + '/answers/'+ratingObject.answerkey, {
+        data: {
+          userEmail : auth.currentUser.email,
+          rating: ratingObject.rating
+              }
+      })
     })
   }
 
-  handleAnswerRating = (e,ratingObject ) => {
-    var newState = Object.assign({}, this.state)
-    newState.answerRatings[ratingObject.commentkey] = {rating: ratingObject.rating}
-    this.setState(newState)
-    base.post('ratings/questions/' + this.state.questionId + '/users/'+auth.currentUser.uid + '/answers/'+ratingObject.commentkey, {
-      data: {
-        userEmail : auth.currentUser.email,
-        rating: ratingObject.rating
-            }
-    })
+  renderCommentGroup() {
+    var COMMENTS;
+    if (this.state.answersData.length === 0) {
+      COMMENTS = (<div>No hay respuestas</div>)
+    } else {
+      COMMENTS = this.state.answersData.map(answer => {
+        return (
+          <Segment key={answer.key}>
+            <Comment>
+              <Comment.Avatar src={DefaultAvatar}/>
+              <div className="right pointer">
+                {auth.currentUser && answer.userEmail === auth.currentUser.email? this.renderDeleteButton(answer.key) : null}
+              </div>
+
+              <Grid>
+              <Grid.Column key={1}>
+                  <Statistic.Value><Icon name='star' /> {answer.votes===0? '-' : Math.round(answer.points/answer.votes)}</Statistic.Value>
+              </Grid.Column>
+
+                <Grid.Column key={2}>
+                  {(this.state.answerRatings) && this.state.answerRatings[answer.key]?(
+                    <Rating icon='star' answerkey={answer.key} rating = {this.state.answerRatings[answer.key].rating} maxRating={5} onRate= {(e,ratingObject)=> {this.handleAnswerRating(e,ratingObject)}}/>
+                  ):(
+                    <Rating icon='star' answerkey={answer.key} rating = {0} maxRating={5} onRate= {(e,ratingObject)=> {this.handleAnswerRating(e,ratingObject)}}/>
+                      )}
+                </Grid.Column>
+              </Grid>
+
+              <Comment.Content>
+                <Comment.Author as='a'>{answer.userEmail}</Comment.Author>
+                <Comment.Text>
+                  <ReactMarkdown source={answer.content}/>
+                </Comment.Text>
+              </Comment.Content>
+            </Comment>
+          </Segment>
+        )
+      })
+    }
+
+    return (
+      <Comment.Group>
+        <Header as='h2' dividing>Respuestas</Header>
+        {COMMENTS}
+        {auth.currentUser? (
+          <Form reply onSubmit={() => this.handleSubmit()}>
+            <Form.TextArea id='field_answer' name='answer' value={this.state.answerInput} onChange={(e) => this.setState({ answerInput: e.target.value })}/>
+            <Form.Button content='Agregar Comentario' labelPosition='left' icon='edit' primary />
+          </Form>
+        ) : (<div>Debes estar logueado para responder</div>)}
+
+      </Comment.Group>
+    )
   }
 
   render() {
@@ -202,10 +264,16 @@ class Question extends Component {
       )
     })
 
+
     return (
       <div className="container">
-        <Rating className = 'right' icon='star' rating={this.state.questionRating} maxRating={5} onRate={this.handleQuestionRating} />
+        <Statistic size="tiny" className="right" color="yellow">
+          <Statistic.Value><Icon name='star' /> {this.state.questionRating}</Statistic.Value>
+        </Statistic>
         <h1> {this.state.questionData.title} </h1>
+        <Rating icon='star' rating={this.state.personalRating} maxRating={5} onRate={(e, values) => this.submitQuestionRating(e, values)} />
+        <br />
+        <br />
         {tags}
         <Segment>
           <ReactMarkdown source={this.state.questionData.content}/>
