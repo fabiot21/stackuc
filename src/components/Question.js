@@ -169,7 +169,7 @@ class Question extends Component {
 
   handleQuestionRating = (e,{ rating, maxRating}) =>{
     this.setState({questionRating: rating})
-    base.post('ratings/questions/'+this.state.questionId+'/users/'+auth.currentUser.uid, {
+    base.update('ratings/questions/'+this.state.questionId+'/users/'+auth.currentUser.uid, {
       data: {
         userEmail : auth.currentUser.email,
         rating: rating
