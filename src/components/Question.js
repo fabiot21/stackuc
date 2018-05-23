@@ -22,8 +22,8 @@ class Question extends Component {
   }
 
   componentDidMount() {
-    this.fetchQuestionData();
     this.fetchQuestionRating();
+    this.fetchQuestionData();
     this.bindAnswers();
   }
 
@@ -41,11 +41,10 @@ class Question extends Component {
   }
 
   fetchQuestionRating() {
-    base.fetch('questions/' + this.state.questionlId, {
+    base.fetch('questions/' + this.state.questionId, {
       context: this,
       asArray: false,
       then(data){
-        console.log("DARDS",data)
         if (data.votes !== 0) {
           this.setState({ questionRating: Math.round(data.points/data.votes) })
         }
