@@ -19,6 +19,7 @@ import NewTutorialForm from './components/NewTutorialForm';
 import Tutorials from './components/Tutorials';
 import Question from './components/Question';
 import Tutorial from './components/Tutorial';
+import Tags from './components/Tags';
 const storeWithMiddleWare = applyMiddleware(ReduxPromise)(createStore);
 
 ReactDOM.render(
@@ -35,6 +36,7 @@ ReactDOM.render(
             <Route exact path='/tutoriales' component={Tutorials}/>
             <Route exact path='/preguntas/:preguntaid/:titulopregunta' component={Question} />
             <Route exact path='/tutoriales/:tutorialid/:titulotutorial' component={Tutorial} />
+            <Route exact path='/tags' component={Tags} />
           </Switch>
         </div>
       </div>

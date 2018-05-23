@@ -26,7 +26,10 @@ class NewTutorialForm extends Component {
         comments: 0,
         views: 0
       }
-    }).then(() => {
+    }).then((data) => {
+      if (this.state.tags.length > 0) {
+        this.state.tags.split(',').map(tag => base.push(`tags/${tag.toLowerCase()}/tutorials/${data.key}`, {data: true}))
+        }
       this.props.history.push('/tutoriales')
     })
   }
