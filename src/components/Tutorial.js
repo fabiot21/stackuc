@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { Confirm, Icon, Segment, Label, Header,Form, Comment,Loader, Rating } from 'semantic-ui-react';
+import { Statistic, Confirm, Icon, Segment, Label, Header,Form, Comment,Loader, Rating } from 'semantic-ui-react';
 import ReactMarkdown from 'react-markdown';
-import { base } from './Firebase';
+import { base, fBase } from './Firebase';
 import { auth } from './Firebase'
 
 import DefaultAvatar from '../assets/default-avatar.png'
@@ -13,14 +13,17 @@ class Tutorial extends Component {
     this.state = {
       tutorialId: this.props.match.params.tutorialid,
       tutorialRating: 0,
+      personalRating: 0,
       commentInput: '',
       commentsData: [],
-      confirmDialogOpen: false
+      confirmDialogOpen: false,
+      hasVoted: false
     }
   }
 
   componentDidMount() {
     this.fetchTutorialData();
+    this.fetchTutorialRating();
     this.bindComments();
   }
 
@@ -30,6 +33,34 @@ class Tutorial extends Component {
       asArray: false,
       then(data){
         this.setState({ tutorialData: data })
+        fBase.database().ref(`tutorials/${this.state.tutorialId}/views`).transaction((i) => {
+          return i + 1;
+        });
+      }
+    });
+  }
+
+  fetchTutorialRating() {
+    base.fetch('tutorials/' + this.state.tutorialId, {
+      context: this,
+      asArray: false,
+      then(data){
+        if (data.votes !== 0) {
+          this.setState({ tutorialRating: Math.round(data.points/data.votes) })
+        }
+      }
+    });
+
+    if (!auth.currentUser) {
+      return false
+    }
+
+    base.fetch(`ratings/tutorials/${this.state.tutorialId}/users/${auth.currentUser.uid}/rating`, {
+      context: this,
+      asArray: false,
+      then(data){
+        this.setState({ hasVoted: true, personalRating: data })
+
       }
     });
   }
@@ -40,10 +71,14 @@ class Tutorial extends Component {
     }
 
     base.push(`comments/${this.state.tutorialId}`, {
-    data: {
-      userEmail: auth.currentUser.email,
-      content: this.state.commentInput
-    }
+      data: {
+        userEmail: auth.currentUser.email,
+        content: this.state.commentInput
+      }
+    }).then(() => {
+      fBase.database().ref(`tutorials/${this.state.tutorialId}/comments`).transaction((i) => {
+        return i + 1;
+      });
     })
 
     this.setState({ commentInput: '' })
@@ -78,6 +113,30 @@ class Tutorial extends Component {
         <Icon color='red' name='delete' size='large'/>
       </div>
     )
+  }
+
+  submitRating(e, { rating }) {
+    if (!auth.currentUser) {
+      return false
+    }
+    fBase.database().ref().transaction(root => {
+      if (root && root.tutorials && root.ratings && auth.currentUser) {
+        if (this.state.hasVoted) {
+          root.tutorials[this.state.tutorialId].votes -= 1
+          root.tutorials[this.state.tutorialId].points -= this.state.personalRating
+        }
+        root.tutorials[this.state.tutorialId].votes += 1
+        root.tutorials[this.state.tutorialId].points += rating
+      }
+      return root;
+    }).then(() => {
+      base.update(`ratings/tutorials/${this.state.tutorialId}/users/${auth.currentUser.uid}`, {
+        data: {
+          rating: rating,
+          userEmail: auth.currentUser.email
+        }
+      }).then(() => this.fetchTutorialRating())
+    });
   }
 
   renderCommentGroup() {
@@ -135,8 +194,13 @@ class Tutorial extends Component {
 
     return (
       <div className="container">
-        <Rating className = 'right' icon='star' rating={this.state.tutorialRating} maxRating={5} onRate={() => {}} />
+        <Statistic size="tiny" className="right" color="yellow">
+          <Statistic.Value><Icon name='star' /> {this.state.tutorialRating}</Statistic.Value>
+        </Statistic>
         <h1> {this.state.tutorialData.title} </h1>
+        <Rating className = '' icon='star' rating={this.state.personalRating} maxRating={5} onRate={(e, values) => this.submitRating(e, values)} />
+        <br />
+        <br />
         {tags}
         <Segment>
           <ReactMarkdown source={this.state.tutorialData.content}/>

@@ -23,7 +23,8 @@ class NewTutorialForm extends Component {
         tags: this.state.tags,
         votes: 0,
         points: 0,
-        comments: 0
+        comments: 0,
+        views: 0
       }
     }).then(() => {
       this.props.history.push('/tutoriales')
