@@ -55,11 +55,13 @@ class Tutorial extends Component {
       return false
     }
 
-    base.fetch(`ratings/tutorials/${this.state.tutorialId}/users/${auth.currentUser.uid}/rating`, {
+    base.fetch(`ratings/tutorials/${this.state.tutorialId}/users/${auth.currentUser.uid}`, {
       context: this,
       asArray: false,
       then(data){
-        this.setState({ hasVoted: true, personalRating: data })
+        if (data.rating) {
+          this.setState({ hasVoted: true, personalRating: data.rating })
+        }
 
       }
     });
@@ -198,7 +200,7 @@ class Tutorial extends Component {
           <Statistic.Value><Icon name='star' /> {this.state.tutorialRating}</Statistic.Value>
         </Statistic>
         <h1> {this.state.tutorialData.title} </h1>
-        <Rating className = '' icon='star' rating={this.state.personalRating} maxRating={5} onRate={(e, values) => this.submitRating(e, values)} />
+        <Rating icon='star' rating={this.state.personalRating} maxRating={5} onRate={(e, values) => this.submitRating(e, values)} />
         <br />
         <br />
         {tags}
