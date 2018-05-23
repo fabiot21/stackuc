@@ -52,14 +52,15 @@ class NewestList extends Component {
         <Item key={element.key}>
           <Item.Content onClick={()=>this.redirectTo(element)}>
             <Item.Header as='a'>{element.title}</Item.Header>
+            <Item.Meta><Icon name='eye' /> {element.views}</Item.Meta>
             <Item.Description>{element.content.slice(0, 120)} ...</Item.Description>
             <Item.Extra>{tags}</Item.Extra>
           </Item.Content>
           <Statistic.Group size='mini'>
-            <Statistic>
+            <Statistic color='blue'>
               <Statistic.Value><Icon name='comments' /> {this.props.data === 'questions'? element.answers : element.comments}</Statistic.Value>
             </Statistic>
-            <Statistic>
+            <Statistic color='yellow'>
               <Statistic.Value><Icon name='star' /> {element.votes !== 0? Math.round(element.points/element.votes) : 0}</Statistic.Value>
             </Statistic>
           </Statistic.Group>

@@ -24,7 +24,8 @@ class NewQuestionForm extends Component {
         votes: 0,
         points: 0,
         answered: false,
-        answers: 0
+        answers: 0,
+        views: 0
       }
     }).then(() => {
       if (this.props.location.pathname === '/preguntas') {
