@@ -16,6 +16,9 @@ class NewQuestionForm extends Component {
 
   onFormSubmit(e) {
     e.preventDefault();
+    if (this.state.title === 0 || this.state.content === 0 || this.state.tags.length === 0) {
+      return false
+    }
     base.push('questions', {
       data: {
         title: this.state.title,
@@ -27,13 +30,21 @@ class NewQuestionForm extends Component {
         answers: 0,
         views: 0
       }
-    }).then(() => {
+    }).then((data) => {
       if (this.props.location.pathname === '/preguntas') {
         window.location.reload()
       } else {
         this.props.history.push('/preguntas')
         this.props.close()
       }
+      this.state.tags.split(',').map(tag => {
+        return base.push(`tags/${tag.trim()}/questions/`, {
+          data: {
+            key: data.key
+          }
+        })
+      })
+
     })
   }
 

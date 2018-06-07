@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import LoginForm from './LoginForm';
 import NewQuestionForm from './NewQuestionForm';
+import NewTutorialForm from './NewTutorialForm';
 import { fLogout, auth } from './Firebase';
 import { Link } from 'react-router-dom';
 import { Input, Menu, Icon, Modal } from 'semantic-ui-react'
@@ -8,7 +9,8 @@ import { Input, Menu, Icon, Modal } from 'semantic-ui-react'
 export default class Header extends Component {
   state = {
     activeUser: false,
-    newQuestionOpen: false
+    newQuestionOpen: false,
+    newTutorialOpen: false
    }
 
   componentDidMount() {
@@ -44,12 +46,22 @@ export default class Header extends Component {
             <Menu.Item name='hacer pregunta'/>
           } closeIcon>
           <Modal.Header>Hacer Pregunta</Modal.Header>
-          <NewQuestionForm close={() => this.setState({ newQuestionOpen: false })}/>
+          <NewQuestionForm close={() => this.setState({ newTutorialOpen: false })}/>
         </Modal>
         <Menu.Item name="crear tutorial">
-          <Link className="item" to="/creartutorial">
-            Crear Tutorial
-          </Link>
+          <Modal
+            onOpen={() => this.setState({ newTutorialOpen: true })}
+            onClose={() => this.setState({ newTutorialOpen: false })}
+            open={this.state.newTutorialOpen}
+            closeOnDimmerClick={false}
+            size="large"
+            dimmer="blurring"
+            trigger={
+              <Menu.Item name='crear tutorial'/>
+            } closeIcon>
+            <Modal.Header>Nuevo Tutorial</Modal.Header>
+            <NewTutorialForm close={() => this.setState({ newTutorialOpen: false })}/>
+          </Modal>
         </Menu.Item>
         <Menu.Menu position='right'>
           <Menu.Item>
