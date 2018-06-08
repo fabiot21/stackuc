@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Form } from 'semantic-ui-react'
-
+import { Modal, Form } from 'semantic-ui-react'
+import { withRouter } from 'react-router-dom';
 import { base } from './Firebase';
 
 class NewTutorialForm extends Component {
@@ -16,6 +16,9 @@ class NewTutorialForm extends Component {
 
   onFormSubmit(e) {
     e.preventDefault();
+    if (this.state.title === 0 || this.state.content === 0 || this.state.tags.length === 0) {
+      return false
+    }
     base.push('tutorials', {
       data: {
         title: this.state.title,
@@ -26,15 +29,26 @@ class NewTutorialForm extends Component {
         comments: 0,
         views: 0
       }
-    }).then(() => {
-      this.props.history.push('/tutoriales')
+    }).then((data) => {
+      if (this.props.location.pathname === '/tutoriales') {
+        window.location.reload()
+      } else {
+        this.props.history.push('/tutoriales')
+        this.props.close()
+      }
+      this.state.tags.split(',').map(tag => {
+        return base.push(`tags/${tag.trim()}/tutorials/`, {
+          data: {
+            key: data.key
+          }
+        })
+      })
     })
   }
 
   render() {
     return (
-      <div>
-        <h1>Nuevo Tutorial</h1>
+      <Modal.Content>
         <Form
           onSubmit={(e) => this.onFormSubmit(e)}>
           <Form.Input
@@ -44,7 +58,7 @@ class NewTutorialForm extends Component {
             onChange={(e) => this.setState({ title: e.target.value})}
             />
           <Form.TextArea
-            rows="35"
+            rows="33"
             placeholder='Contenido'
             value={this.state.content}
             onChange={(e) => this.setState({ content: e.target.value})}
@@ -57,9 +71,11 @@ class NewTutorialForm extends Component {
             />
           <Form.Button floated="right" primary>Crear Tutorial</Form.Button>
          </Form>
-      </div>
+         <br />
+         <br />
+      </Modal.Content>
     )
   }
 }
 
-export default NewTutorialForm;
+export default withRouter(NewTutorialForm);

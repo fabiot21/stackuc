@@ -3,7 +3,7 @@ import { base } from '../Firebase';
 import { Container, Pagination, Icon, Statistic, Loader, Item, Label } from 'semantic-ui-react';
 import { withRouter } from 'react-router-dom';
 
-class NewestList extends Component {
+class TagsNewestList extends Component {
   constructor(props) {
     super(props);
 
@@ -26,13 +26,13 @@ class NewestList extends Component {
 
   onClickTag(e) {
     e.stopPropagation();
-    console.log(e.currentTarget.textContent);
     if(this.props.data==='questions'){
       this.props.history.push('/tags/preguntas/' + e.currentTarget.textContent.replace(/ /g, '-'))
     }
     else{
       this.props.history.push('/tags/tutoriales/' + e.currentTarget.textContent.replace(/ /g, '-'))
     }
+    window.location.reload()
   }
 
   componentDidMount() {
@@ -40,8 +40,9 @@ class NewestList extends Component {
     context: this,
     asArray: true,
     then(data){
-      this.setState({ list: data.reverse() })
-      this.setState({ totalPages: Math.trunc((data.length - 1) / 5) + 1 })
+      const filterList = data.filter(elem => elem.tags.split(',').map(tag => tag.trim().toLowerCase()).indexOf(this.props.match.params.tag.replace('-', ' ').toLowerCase()) !== -1)
+      this.setState({ list: filterList.reverse() })
+      this.setState({ totalPages: Math.trunc((filterList.length - 1) / 5) + 1 })
     }
   });
   }
@@ -77,17 +78,11 @@ class NewestList extends Component {
               <Statistic.Value><Icon name='star' /> {element.votes !== 0? Math.round(element.points/element.votes) : 0}</Statistic.Value>
             </Statistic>
           </Statistic.Group>
-
         </Item>
       )
     })
     return (
       <div className="container">
-        {this.props.data === 'questions'? (
-          <h1>Preguntas Recientes</h1>
-        ) : (
-          <h1>Tutoriales Recientes</h1>
-        )}
         <Item.Group link divided>
           {list}
         </Item.Group>
@@ -99,4 +94,4 @@ class NewestList extends Component {
   }
 }
 
-export default withRouter(NewestList);
+export default withRouter(TagsNewestList);

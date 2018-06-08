@@ -41,3 +41,7 @@ body {
   margin-right: 25%;
   margin-bottom: 60px;
 }
+
+.sidebar {
+  background-color: #002e5e !important;
+}
