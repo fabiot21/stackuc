@@ -1,5 +1,19 @@
 import React, { Component } from 'react';
-import { Grid,Statistic, Confirm, Icon, Segment, Label, Header,Form, Comment,Loader, Rating } from 'semantic-ui-react';
+import {
+  Input,
+  Grid,
+  Statistic,
+  Confirm,
+  Icon,
+  Segment,
+  Label,
+  Header,
+  Form,
+  Comment,
+  Loader,
+  Rating,
+  Button
+} from 'semantic-ui-react';
 import ReactMarkdown from 'react-markdown';
 import { base, fBase } from './Firebase';
 import { auth } from './Firebase'
@@ -17,8 +31,12 @@ class Question extends Component {
       answerInput: '',
       answersData: [],
       confirmDialogOpen: false,
+      confirmDialogOpenComment: false,
       hasVoted: false,
       answerRatings: {},
+      activateComment: true,
+      commentValue: '',
+      commentsData: []
     }
   }
 
@@ -27,6 +45,7 @@ class Question extends Component {
     this.fetchQuestionData();
     this.handleAuthStateChange();
     this.bindAnswers();
+    this.bindComments();
   }
 
 
@@ -111,7 +130,14 @@ class Question extends Component {
       state: 'answersData',
       asArray: true
     })
+  }
 
+  bindComments() {
+    base.bindToState(`questions/${this.state.questionId}/comments`, {
+      context: this,
+      state: 'commentsData',
+      asArray: true
+    })
   }
 
   renderDeleteButton(key) {
@@ -135,6 +161,27 @@ class Question extends Component {
         />
 
         <Icon color='red' name='delete' size='large'/>
+      </div>
+    )
+  }
+
+  renderCommentDeleteButton(key) {
+    return (
+      <div onClick={() => this.setState({confirmDialogOpenComment: true})} >
+        <Confirm
+          dimmer="blurring"
+          cancelButton = 'Cancelar'
+          confirmButton = 'Si'
+          content = '¿Estás seguro de borrar este comentario?'
+          open={this.state.confirmDialogOpenComment}
+          onCancel={() => this.setState({confirmDialogOpenComment: false})}
+          onConfirm={() => {
+            this.setState({confirmDialogOpenComment: false}) ;
+            base.remove(`questions/${this.state.questionId}/comments/${key}`)
+          }}
+        />
+
+        <Icon color='red' name='delete'/>
       </div>
     )
   }
@@ -204,27 +251,21 @@ class Question extends Component {
       COMMENTS = this.state.answersData.map(answer => {
         return (
           <Segment key={answer.key}>
-            <Comment>
+            <Comment style={{ marginTop: '10px' }} >
               <Comment.Avatar src={DefaultAvatar}/>
               <div className="right pointer">
                 {auth.currentUser && answer.userEmail === auth.currentUser.email? this.renderDeleteButton(answer.key) : null}
               </div>
-
-              <Grid>
-              <Grid.Column key={1}>
-                  <Statistic.Value><Icon name='star' /> {answer.votes===0? '-' : Math.round(answer.points/answer.votes)}</Statistic.Value>
-              </Grid.Column>
-
-                <Grid.Column key={2}>
+              <Grid style={{ marginTop: '5px' }}>
+                  <Statistic.Value><Icon name='star' /> {answer.votes===0? '' : Math.round(answer.points/answer.votes)}</Statistic.Value>
                   {(this.state.answerRatings) && this.state.answerRatings[answer.key]?(
                     <Rating icon='star' answerkey={answer.key} rating = {this.state.answerRatings[answer.key].rating} maxRating={5} onRate= {(e,ratingObject)=> {this.handleAnswerRating(e,ratingObject)}}/>
                   ):(
                     <Rating icon='star' answerkey={answer.key} rating = {0} maxRating={5} onRate= {(e,ratingObject)=> {this.handleAnswerRating(e,ratingObject)}}/>
-                      )}
-                </Grid.Column>
+                  )}
               </Grid>
 
-              <Comment.Content>
+              <Comment.Content style={{ marginTop: '25px' }}>
                 <Comment.Author as='a'>{answer.userEmail}</Comment.Author>
                 <Comment.Text>
                   <ReactMarkdown source={answer.content}/>
@@ -251,6 +292,17 @@ class Question extends Component {
     )
   }
 
+  onSubmitComment(e) {
+    e.preventDefault();
+
+    base.push(`questions/${this.state.questionId}/comments`, {
+      data: {
+        content: this.state.commentValue,
+        userEmail: auth.currentUser.email
+      }
+    }).then(() => this.setState({ activateComment: true, commentValue: '' }))
+  }
+
   render() {
     if (!this.state.questionData) {
       return (
@@ -264,6 +316,20 @@ class Question extends Component {
       )
     })
 
+    const comments = this.state.commentsData.map(comment => {
+      return (
+        <div>
+          <div className="right pointer">
+            {auth.currentUser && comment.userEmail === auth.currentUser.email? this.renderCommentDeleteButton(comment.key) : null}
+          </div>
+          <Label color="blue" className="right" compact={true} size="medium" secondary key={comment.key}>
+            {comment.content} - {comment.userEmail}
+        </Label>
+        <br />
+        <br />
+        </div>
+      )
+    })
 
     return (
       <div className="container">
@@ -278,6 +344,21 @@ class Question extends Component {
         <Segment>
           <ReactMarkdown source={this.state.questionData.content}/>
         </Segment>
+        {comments}
+        {this.state.activateComment? (
+          <a onClick={() => this.setState({ activateComment: false })} className="pointer"><Icon name="add"/> comentario</a>
+        ) : (
+          <form
+            onSubmit={(e) => this.onSubmitComment(e)}
+            style={{ width: "70%" }}>
+            <Input
+              fluid
+              onChange={(e) => this.setState({ commentValue: e.target.value })}
+              value={this.state.commentValue}
+              icon='add'
+              placeholder='Comentario...' />
+          </form>
+        )}
         {this.renderCommentGroup()}
       </div>
     );

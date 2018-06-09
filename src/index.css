@@ -45,3 +45,8 @@ body {
 .sidebar {
   background-color: #002e5e !important;
 }
+
+.comment {
+  position: absolute;
+  right: 0;
+}
