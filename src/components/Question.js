@@ -11,8 +11,7 @@ import {
   Form,
   Comment,
   Loader,
-  Rating,
-  Button
+  Rating
 } from 'semantic-ui-react';
 import ReactMarkdown from 'react-markdown';
 import { base, fBase } from './Firebase';
@@ -34,7 +33,7 @@ class Question extends Component {
       confirmDialogOpenComment: false,
       hasVoted: false,
       answerRatings: {},
-      activateComment: true,
+      activateComment: false,
       commentValue: '',
       commentsData: []
     }
@@ -130,6 +129,26 @@ class Question extends Component {
       state: 'answersData',
       asArray: true
     })
+
+    base.listenTo('answers/' + this.state.questionId, {
+      context: this,
+      asArray: true,
+      then(data){
+        let newState = {}
+        data.map(answer => {
+          newState['activateComment' + answer.key] = false
+          newState['commentValue' + answer.key] = ''
+          newState['confirmDialogOpenAnswerComment' + answer.key] = false
+          if (answer.comments !== undefined) {
+            newState['commentsData' + answer.key] = answer.comments
+          } else {
+            newState['commentsData' + answer.key] = []
+          }
+          return true
+        })
+        this.setState(newState)
+      }
+    })
   }
 
   bindComments() {
@@ -159,7 +178,6 @@ class Question extends Component {
             });
           }}
         />
-
         <Icon color='red' name='delete' size='large'/>
       </div>
     )
@@ -182,6 +200,36 @@ class Question extends Component {
         />
 
         <Icon color='red' name='delete'/>
+      </div>
+    )
+  }
+
+  renderAnswerCommentDeleteButton(keyAnswer, keyComment) {
+    return (
+      <div onClick={() => {
+        var newState = {}
+        newState[`confirmDialogOpenAnswerComment${keyComment}`] = true
+        this.setState(newState)
+      }} >
+      <Confirm
+        dimmer="blurring"
+        cancelButton = 'Cancelar'
+        confirmButton = 'Si'
+        content = '¿Estás seguro de borrar este comentario?'
+        open={this.state[`confirmDialogOpenAnswerComment${keyComment}`]}
+        onCancel={() => {
+          var newState = {}
+          newState[`confirmDialogOpenAnswerComment${keyComment}`] = false
+          this.setState(newState)
+      }}
+        onConfirm={() => {
+          var newState = {}
+          newState[`confirmDialogOpenAnswerComment${keyComment}`] = false
+          this.setState(newState)
+          base.remove(`answers/${this.state.questionId}/${keyAnswer}/comments/${keyComment}`)
+        }}
+      />
+      <Icon color='red' name='delete'/>
       </div>
     )
   }
@@ -211,8 +259,6 @@ class Question extends Component {
   }
 
   checkIfUserRatedAnswer(answerKey){
-    console.log(this.state.answerRatings[answerKey])
-    console.log(!(!this.state.asnwerRatings || !this.state.answerRatings[answerKey]))
     return !(!this.state.answerRatings || !this.state.answerRatings[answerKey]);
   }
 
@@ -244,35 +290,80 @@ class Question extends Component {
   }
 
   renderCommentGroup() {
-    var COMMENTS;
+    var ANSWERS;
     if (this.state.answersData.length === 0) {
-      COMMENTS = (<div>No hay respuestas</div>)
+      ANSWERS = (<div>No hay respuestas</div>)
     } else {
-      COMMENTS = this.state.answersData.map(answer => {
-        return (
-          <Segment key={answer.key}>
-            <Comment style={{ marginTop: '10px' }} >
-              <Comment.Avatar src={DefaultAvatar}/>
+      ANSWERS = this.state.answersData.map(answer => {
+        if (!this.state[`commentsData${answer.key}`]) {
+          return null
+        }
+        const COMMENTS = Object.keys(this.state[`commentsData${answer.key}`]).map(key => {
+          return (
+            <div key={key}>
               <div className="right pointer">
-                {auth.currentUser && answer.userEmail === auth.currentUser.email? this.renderDeleteButton(answer.key) : null}
+                {auth.currentUser && this.state[`commentsData${answer.key}`][key].userEmail === auth.currentUser.email? this.renderAnswerCommentDeleteButton(answer.key, key) : null}
               </div>
-              <Grid style={{ marginTop: '5px' }}>
+              <Label color="teal" className="right" size="small">
+                {this.state[`commentsData${answer.key}`][key].content} - {this.state[`commentsData${answer.key}`][key].userEmail}
+              </Label>
+              <br />
+              <br />
+            </div>
+          )
+        })
+        return (
+          <div key={answer.key}>
+            <Segment>
+              <Comment style={{ marginTop: '10px' }} >
+                <Comment.Avatar src={DefaultAvatar}/>
+                <div className="right pointer">
+                  {auth.currentUser && answer.userEmail === auth.currentUser.email? this.renderDeleteButton(answer.key) : null}
+                </div>
+                <Grid style={{ marginTop: '5px' }}>
                   <Statistic.Value><Icon name='star' /> {answer.votes===0? '' : Math.round(answer.points/answer.votes)}</Statistic.Value>
                   {(this.state.answerRatings) && this.state.answerRatings[answer.key]?(
                     <Rating icon='star' answerkey={answer.key} rating = {this.state.answerRatings[answer.key].rating} maxRating={5} onRate= {(e,ratingObject)=> {this.handleAnswerRating(e,ratingObject)}}/>
                   ):(
                     <Rating icon='star' answerkey={answer.key} rating = {0} maxRating={5} onRate= {(e,ratingObject)=> {this.handleAnswerRating(e,ratingObject)}}/>
                   )}
-              </Grid>
-
-              <Comment.Content style={{ marginTop: '25px' }}>
-                <Comment.Author as='a'>{answer.userEmail}</Comment.Author>
-                <Comment.Text>
-                  <ReactMarkdown source={answer.content}/>
-                </Comment.Text>
-              </Comment.Content>
-            </Comment>
-          </Segment>
+                </Grid>
+                <Comment.Content style={{ marginTop: '25px' }}>
+                  <Comment.Author as='a'>{answer.userEmail}</Comment.Author>
+                  <Comment.Text>
+                    <ReactMarkdown source={answer.content}/>
+                  </Comment.Text>
+                </Comment.Content>
+              </Comment>
+            </Segment>
+            {COMMENTS}
+            {!this.state[`activateComment${answer.key}`]? (
+              <a onClick={() => {
+                  var ObjActivateComment = {}
+                  ObjActivateComment[`activateComment${answer.key}`] = true
+                  this.setState(ObjActivateComment)}
+                } className="pointer"><Icon name="add"/> comentario</a>
+            ) : (
+              <form
+                onSubmit={(e) => this.onSubmitCommentAnswer(e, answer.key)}
+                style={{ width: "70%" }}>
+                <Input
+                  fluid
+                  onChange={(e) => {
+                    var ObjCommentValue = {}
+                    ObjCommentValue[`commentValue${answer.key}`] = e.target.value
+                    this.setState(ObjCommentValue)
+                  }}
+                  value={this.state[`commentValue${answer.key}`]? this.state[`commentValue${answer.key}`] : ''}
+                  icon='add'
+                  autoFocus
+                  placeholder='Comentario...' />
+              </form>
+            )}
+            <br />
+            <br />
+            <br />
+          </div>
         )
       })
     }
@@ -280,7 +371,7 @@ class Question extends Component {
     return (
       <Comment.Group>
         <Header as='h2' dividing>Respuestas</Header>
-        {COMMENTS}
+        {ANSWERS}
         {auth.currentUser? (
           <Form reply onSubmit={() => this.handleSubmit()}>
             <Form.TextArea id='field_answer' name='answer' value={this.state.answerInput} onChange={(e) => this.setState({ answerInput: e.target.value })}/>
@@ -300,7 +391,23 @@ class Question extends Component {
         content: this.state.commentValue,
         userEmail: auth.currentUser.email
       }
-    }).then(() => this.setState({ activateComment: true, commentValue: '' }))
+    }).then(() => this.setState({ activateComment: false, commentValue: '' }))
+  }
+
+  onSubmitCommentAnswer(e, key) {
+    e.preventDefault();
+
+    base.push(`answers/${this.state.questionId}/${key}/comments`, {
+      data: {
+        content: this.state[`commentValue${key}`],
+        userEmail: auth.currentUser.email
+      }
+    }).then(() => {
+      var newState = {}
+      newState[`activateComment${key}`] = false
+      newState[`commentValue${key}`] = ''
+      this.setState(newState)
+    })
   }
 
   render() {
@@ -316,17 +423,17 @@ class Question extends Component {
       )
     })
 
-    const comments = this.state.commentsData.map(comment => {
+    const COMMENTS = this.state.commentsData.map(comment => {
       return (
-        <div>
+        <div key={comment.key}>
           <div className="right pointer">
             {auth.currentUser && comment.userEmail === auth.currentUser.email? this.renderCommentDeleteButton(comment.key) : null}
           </div>
-          <Label color="blue" className="right" compact={true} size="medium" secondary key={comment.key}>
+          <Label color="blue" className="right" size="medium" key={comment.key}>
             {comment.content} - {comment.userEmail}
-        </Label>
-        <br />
-        <br />
+          </Label>
+          <br />
+          <br />
         </div>
       )
     })
@@ -344,9 +451,9 @@ class Question extends Component {
         <Segment>
           <ReactMarkdown source={this.state.questionData.content}/>
         </Segment>
-        {comments}
-        {this.state.activateComment? (
-          <a onClick={() => this.setState({ activateComment: false })} className="pointer"><Icon name="add"/> comentario</a>
+        {COMMENTS}
+        {!this.state.activateComment? (
+          <a onClick={() => this.setState({ activateComment: true })} className="pointer"><Icon name="add"/> comentario</a>
         ) : (
           <form
             onSubmit={(e) => this.onSubmitComment(e)}
@@ -356,7 +463,9 @@ class Question extends Component {
               onChange={(e) => this.setState({ commentValue: e.target.value })}
               value={this.state.commentValue}
               icon='add'
+              autoFocus
               placeholder='Comentario...' />
+
           </form>
         )}
         {this.renderCommentGroup()}

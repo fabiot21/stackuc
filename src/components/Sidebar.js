@@ -36,6 +36,7 @@ class SidebarComponent extends Component {
             </Menu.Item>
             <Link to="/">
               <Menu.Item
+                as="h4"
                 size="large"
                 onClick={() => this.setState({ active: 'home' })}
                 className="pointer" active={this.state.active === 'home'} name='inicio'>
@@ -45,6 +46,7 @@ class SidebarComponent extends Component {
             </Link>
             <Link to="/preguntas">
               <Menu.Item
+                as="h4"
                 onClick={() => this.setState({ active: 'questions' })}
                 className="pointer"
                 active={this.state.active === 'questions'}
@@ -55,6 +57,7 @@ class SidebarComponent extends Component {
             </Link>
             <Link to="/tutoriales">
               <Menu.Item
+                as="h4"
                 onClick={() => this.setState({ active: 'tutorials' })}
                 className="pointer"
                 active={this.state.active === 'tutorials'}
