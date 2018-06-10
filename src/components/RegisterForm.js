@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Modal, Button, Form, Grid, Header, Segment } from 'semantic-ui-react';
-import { fRegister } from './Firebase';
+import {auth,base } from './Firebase';
 
 class Register extends Component {
   constructor(props) {
@@ -9,16 +9,38 @@ class Register extends Component {
     this.state = {
       email: '',
       password: '',
-      password2: ''
+      password2: '',
+      userName: '',
     }
   }
 
   onFormSubmit() {
-    fRegister(this.state.email, this.state.password)
-      .then((data) => {
-        this.props.registerSuccess()
-      });
+    this.checkIfUserNameExistThenCreateAccount()
   }
+
+  checkIfUserNameExistThenCreateAccount(){
+    base.fetch('users/' + this.state.userName, {
+      context: this,
+      asArray: false,
+      then(data){
+        if(!data || Object.keys(data).length===0){ //Crear cuenta solo si el userName no existe de antemano
+          this.createAccount()
+        }
+      }
+    });
+  }
+
+  createAccount(){
+    auth.createUserWithEmailAndPassword(this.state.email, this.state.password).then((authUser)=>this.props.registerSuccess())
+    base.post('users/'+this.state.userName, {
+      data: {
+        userEmail: this.state.email
+      }
+    }).then(() => {
+       this.props.registerSuccess()
+    })
+  }
+
 
   render() {
     return (
@@ -40,6 +62,14 @@ class Register extends Component {
                   <Form.Input
                     fluid
                     icon='user'
+                    iconPosition='left'
+                    placeholder='Nombre de usuario'
+                    value={this.state.userName}
+                    onChange={(e) => this.setState({ userName: e.target.value })}
+                    />
+                  <Form.Input
+                    fluid
+                    icon='mail'
                     iconPosition='left'
                     placeholder='E-mail'
                     value={this.state.email}
