@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Modal, Form } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom';
-import { base } from './Firebase';
+import { base, auth } from './Firebase';
 
 class NewQuestionForm extends Component {
   constructor(props) {
@@ -16,7 +16,7 @@ class NewQuestionForm extends Component {
 
   onFormSubmit(e) {
     e.preventDefault();
-    if (this.state.title === 0 || this.state.content === 0 || this.state.tags.length === 0) {
+    if (this.state.title === 0 || this.state.content === 0 || this.state.tags.length === 0 || !auth.currentUser) {
       return false
     }
     base.push('questions', {
@@ -28,7 +28,8 @@ class NewQuestionForm extends Component {
         points: 0,
         answered: false,
         answers: 0,
-        views: 0
+        views: 0,
+        author: auth.currentUser.email
       }
     }).then((data) => {
       if (this.props.location.pathname === '/preguntas') {
