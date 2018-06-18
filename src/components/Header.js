@@ -6,6 +6,7 @@ import { fLogout, auth } from './Firebase';
 import { Link } from 'react-router-dom';
 import { Input, Menu, Icon, Modal } from 'semantic-ui-react'
 import { connect } from 'react-redux'
+import { removeCurrentUser } from '../actions/user_actions'
 
 class Header extends Component {
   state = {
@@ -25,6 +26,7 @@ class Header extends Component {
   }
 
   logout() {
+    this.props.removeCurrentUser()
     fLogout()
   }
 
@@ -102,12 +104,12 @@ class Header extends Component {
   }
 }
 
-function mapStateToProps({ currentUser }){
+function mapStateToProps({ currentUser, removeCurrentUser }){
   return {
-    currentUser
+    currentUser, removeCurrentUser
   }
 }
 
 export default connect(
   mapStateToProps,
-  { })(Header)
+  { removeCurrentUser })(Header)

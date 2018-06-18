@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Modal, Button, Form, Grid, Header, Segment } from 'semantic-ui-react';
 import {auth,base } from './Firebase';
+import { setUserInfo } from '../actions/user_actions.js'
+import { connect } from 'react-redux'
 
 class Register extends Component {
   constructor(props) {
@@ -38,6 +40,7 @@ class Register extends Component {
       }
     }).then(() => {
        this.props.registerSuccess()
+       this.props.setUserInfo(this.state.email)
     })
   }
 
@@ -104,4 +107,12 @@ class Register extends Component {
   }
 }
 
-export default Register;
+function mapStateToProps({ currentUser , setUserInfo}){
+  return {
+    currentUser, setUserInfo
+  }
+}
+
+export default connect(
+  mapStateToProps,
+  { setUserInfo })(Register)
