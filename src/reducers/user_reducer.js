@@ -1,6 +1,6 @@
 import { SET_CURRENT_USER } from '../actions/user_actions';
 
-const initialState = {"userName": "", "userEmail":""};
+const initialState = {};
 
 export default function(state = initialState, action) {
   console.log(action)

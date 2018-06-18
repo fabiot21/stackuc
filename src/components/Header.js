@@ -29,6 +29,16 @@ class Header extends Component {
   }
 
   render() {
+        var userProfile;
+        if (!this.props.currentUser || !this.props.currentUser.userName || (this.props.currentUser.userName=="")) {
+          userProfile = <br/>;
+        } else {
+          userProfile = <Menu.Item name="perfil">
+                        <Link style={{ color: "inherit" } } to={"/profile/" + this.props.currentUser.userName}>
+                          <Icon name='user' />
+                        </Link>
+                      </Menu.Item>;
+        }
     return (
       <Menu className="container" secondary>
         <Menu.Item name="home">
@@ -68,11 +78,7 @@ class Header extends Component {
           <Menu.Item>
             <Input icon='search' placeholder='Buscar...' />
           </Menu.Item>
-          <Menu.Item name="perfil">
-            <Link style={{ color: "inherit" } } to="/profile/holix">
-              <Icon name='user' />
-            </Link>
-          </Menu.Item>
+          {userProfile}
           {!this.state.activeUser? (
             <Modal dimmer="blurring" trigger={
                 <Menu.Item name='Iniciar Sesión'/>
