@@ -2,11 +2,12 @@ import React, { Component } from 'react';
 import LoginForm from './LoginForm';
 import NewQuestionForm from './NewQuestionForm';
 import NewTutorialForm from './NewTutorialForm';
-import { fLogout, auth } from './FireBase';
+import { fLogout, auth } from './Firebase';
 import { Link } from 'react-router-dom';
 import { Input, Menu, Icon, Modal } from 'semantic-ui-react'
+import { connect } from 'react-redux'
 
-export default class Header extends Component {
+class Header extends Component {
   state = {
     activeUser: false,
     newQuestionOpen: false,
@@ -67,6 +68,11 @@ export default class Header extends Component {
           <Menu.Item>
             <Input icon='search' placeholder='Buscar...' />
           </Menu.Item>
+          <Menu.Item name="perfil">
+            <Link style={{ color: "inherit" } } to="/profile/holix">
+              <Icon name='user' />
+            </Link>
+          </Menu.Item>
           {!this.state.activeUser? (
             <Modal dimmer="blurring" trigger={
                 <Menu.Item name='Iniciar Sesión'/>
@@ -89,3 +95,13 @@ export default class Header extends Component {
     )
   }
 }
+
+function mapStateToProps({ currentUser }){
+  return {
+    currentUser
+  }
+}
+
+export default connect(
+  mapStateToProps,
+  { })(Header)

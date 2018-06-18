@@ -18,6 +18,7 @@ import Question from './components/Question';
 import Tutorial from './components/Tutorial';
 import NewestList from './components/shared/NewestList';
 import TagsNewestList from './components/shared/TagsNewestList';
+import UserProfile from './components/UserProfile';
 const storeWithMiddleWare = applyMiddleware(ReduxPromise)(createStore);
 
 ReactDOM.render(
@@ -29,6 +30,7 @@ ReactDOM.render(
         <div className="marginSide">
           <Switch>
             <Route exact path='/' component={Home}/>
+            <Route exact path='/profile/:userName' component= {UserProfile}/>
             <Route exact path='/preguntas' component={() => <NewestList data="questions"/>}/>
             <Route exact path='/tutoriales' component={() => <NewestList data="tutorials"/>}/>
             <Route exact path='/preguntas/:preguntaid/:titulopregunta' component={Question} />

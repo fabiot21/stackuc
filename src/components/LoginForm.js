@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import Register from './RegisterForm';
 import { fLogin, auth } from './Firebase';
 import { Modal, Button, Form, Grid, Header, Message, Segment } from 'semantic-ui-react'
+import { connect } from 'react-redux'
+import { setUserInfo } from '../actions/user_actions.js'
 
 class LoginForm extends Component {
   constructor(props){
@@ -16,7 +18,7 @@ class LoginForm extends Component {
 
   onLoginFormSubmit() {
     fLogin(this.state.email, this.state.password)
-      .then((data) => console.log(auth.currentUser));
+      .then((data) => this.props.setUserInfo(this.state.email));
   }
 
   render() {
@@ -73,4 +75,12 @@ class LoginForm extends Component {
   }
 }
 
-export default LoginForm
+function mapStateToProps({ currentUser , setUserInfo}){
+  return {
+    currentUser, setUserInfo
+  }
+}
+
+export default connect(
+  mapStateToProps,
+  { setUserInfo })(LoginForm)

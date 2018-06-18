@@ -13,4 +13,18 @@ var auth = firebase.auth();
 
 var fLogin = (email, password) => auth.signInWithEmailAndPassword(email, password)
 var fLogout = (email, password) => auth.signOut()
+
+export function getUserNameFromEmail(email){
+  base.fetch('users/', {
+      context: this,
+      asArray: false,
+      queries: {
+        orderByChild: 'userEmail',
+        equalTo: email
+        }
+    });
+}
+
+
+
 export { base, fBase, fLogout, fLogin, auth };
