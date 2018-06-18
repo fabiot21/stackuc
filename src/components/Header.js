@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import LoginForm from './LoginForm';
 import NewQuestionForm from './NewQuestionForm';
 import NewTutorialForm from './NewTutorialForm';
-import { fLogout, auth } from './Firebase';
+import { fLogout, auth } from './FireBase';
 import { Link } from 'react-router-dom';
 import { Input, Menu, Icon, Modal } from 'semantic-ui-react'
 
