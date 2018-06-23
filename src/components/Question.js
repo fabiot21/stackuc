@@ -45,6 +45,7 @@ class Question extends Component {
     this.handleAuthStateChange();
     this.bindAnswers();
     this.bindComments();
+    console.log(this.state)
   }
 
 
@@ -161,7 +162,7 @@ class Question extends Component {
 
   renderDeleteButton(key) {
     return (
-      <div onClick={() => this.setState({confirmDialogOpen: true})} >
+      <div onClick={() => this.setState({confirmDialogOpen: true}) } >
         <Confirm
           dimmer="blurring"
           cancelButton = 'Cancelar'
@@ -185,7 +186,7 @@ class Question extends Component {
 
   renderCommentDeleteButton(key) {
     return (
-      <div onClick={() => this.setState({confirmDialogOpenComment: true})} >
+      <div onClick={() => this.setState({confirmDialogOpenComment: true})}>
         <Confirm
           dimmer="blurring"
           cancelButton = 'Cancelar'
