@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Modal, Form } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom';
-import { base } from './Firebase';
+import { base, auth } from './Firebase';
 
 class NewQuestionForm extends Component {
   constructor(props) {
@@ -19,8 +19,10 @@ class NewQuestionForm extends Component {
     if (this.state.title === 0 || this.state.content === 0 || this.state.tags.length === 0) {
       return false
     }
+    const userEmail = auth.currentUser.email || null;
     base.push('questions', {
       data: {
+        author: userEmail,
         title: this.state.title,
         content: this.state.content,
         tags: this.state.tags,
