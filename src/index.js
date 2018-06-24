@@ -23,7 +23,7 @@ import Question from './components/Question';
 import Tutorial from './components/Tutorial';
 import NewestList from './components/shared/NewestList';
 import TagsNewestList from './components/shared/TagsNewestList';
-import UserProfile from './components/UserProfile';
+import UserProfile from './components/userProfile/UserProfile';
 
 const persistConfig = {
   key: 'root',
