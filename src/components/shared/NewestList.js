@@ -63,7 +63,7 @@ class NewestList extends Component {
             newState[`dialogOpen${key}`] = false;
             delete newState.list[i]
             this.setState(newState);
-            base.remove(`questions/${key}/`);
+            base.remove(`${this.props.data}/${key}/`);
           }}
         />
         <Icon color="red" name="delete" size="large" />
