@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Menu, Feed, Card, Icon, Image } from 'semantic-ui-react'
 import DefaultAvatar from '../../assets/default-avatar.png'
-import UserQuestions from './UserQuestions'
+import UserContent from './UserContent'
 
 class UserInfo extends Component {
 
@@ -19,11 +19,11 @@ class UserInfo extends Component {
   renderContent(){
     switch(this.state.optionPicked){
       case "preguntas":
-        return <UserQuestions history={this.props.history}/>
+        return <UserContent contentType="questions" history={this.props.history}/>
       case "tutoriales":
-        return <div> Tutoriales </div>
+        return <UserContent contentType="tutorials" history={this.props.history}/>
       case "respuestas":
-        return <div> Respuestas </div>
+        return <UserContent contentType="answers" history={this.props.history}/>
       default:
         return
     }
