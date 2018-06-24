@@ -19,7 +19,7 @@ class UserInfo extends Component {
   renderContent(){
     switch(this.state.optionPicked){
       case "preguntas":
-        return <UserQuestions/>
+        return <UserQuestions history={this.props.history}/>
       case "tutoriales":
         return <div> Tutoriales </div>
       case "respuestas":

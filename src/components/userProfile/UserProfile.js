@@ -11,7 +11,7 @@ class UserProfile extends Component {
     return(
       <Grid>
         <Grid.Column width={13}>
-          <UserActivity/>
+          <UserActivity history={this.props.history}/>
         </Grid.Column>
 
         <Grid.Column width={3}>

@@ -29,10 +29,15 @@ class UserQuestions extends Component {
     });
   }
 
+  redirectToQuestion(question){
+    this.props.history.push('/preguntas/' + question.key + '/' + question.title.replace(/ /g, '-'))
+  }
+
   renderQuestionFeed(question){
     const questionSummary = ("Preguntaste " +question.title + "")
     return(
       <Feed.Event
+        onClick = {()=>this.redirectToQuestion(question)}
         icon='question circle'
         date='TODO: agregar fecha a todo'
         summary= {questionSummary}
