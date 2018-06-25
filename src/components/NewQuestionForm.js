@@ -16,7 +16,7 @@ class NewQuestionForm extends Component {
 
   onFormSubmit(e) {
     e.preventDefault();
-    if (this.state.title === 0 || this.state.content === 0 || this.state.tags.length === 0) {
+    if (this.state.title === 0 || this.state.content === 0 || this.state.tags.length === 0 || !auth.currentUser) {
       return false
     }
     const userEmail = auth.currentUser.email || null;
@@ -30,7 +30,8 @@ class NewQuestionForm extends Component {
         points: 0,
         answered: false,
         answers: 0,
-        views: 0
+        views: 0,
+        author: auth.currentUser.email
       }
     }).then((data) => {
       if (this.props.location.pathname === '/preguntas') {

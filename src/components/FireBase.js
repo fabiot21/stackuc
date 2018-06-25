@@ -11,8 +11,20 @@ var fBase = firebase.initializeApp({
 var base = Rebase.createClass(fBase.database());
 var auth = firebase.auth();
 
-var fRegister = (email, password) => auth.createUserWithEmailAndPassword(email, password)
 var fLogin = (email, password) => auth.signInWithEmailAndPassword(email, password)
 var fLogout = (email, password) => auth.signOut()
 
-export { base, fBase, fRegister, fLogout, fLogin, auth };
+export function getUserNameFromEmail(email){
+  base.fetch('users/', {
+      context: this,
+      asArray: false,
+      queries: {
+        orderByChild: 'userEmail',
+        equalTo: email
+        }
+    });
+}
+
+
+
+export { base, fBase, fLogout, fLogin, auth };

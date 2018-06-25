@@ -5,8 +5,10 @@ import NewTutorialForm from './NewTutorialForm';
 import { fLogout, auth } from './Firebase';
 import { Link } from 'react-router-dom';
 import { Input, Menu, Icon, Modal } from 'semantic-ui-react'
+import { connect } from 'react-redux'
+import { removeCurrentUser } from '../actions/user_actions'
 
-export default class Header extends Component {
+class Header extends Component {
   state = {
     activeUser: false,
     newQuestionOpen: false,
@@ -24,10 +26,21 @@ export default class Header extends Component {
   }
 
   logout() {
+    this.props.removeCurrentUser()
     fLogout()
   }
 
   render() {
+        var userProfile;
+        if (!this.props.currentUser || !this.props.currentUser.userName || (this.props.currentUser.userName=="")) {
+          userProfile = <br/>;
+        } else {
+          userProfile = <Menu.Item name="perfil">
+                        <Link style={{ color: "inherit" } } to={"/profile/" + this.props.currentUser.userName}>
+                          <Icon name='user' />
+                        </Link>
+                      </Menu.Item>;
+        }
     return (
       <Menu className="container" secondary>
         <Menu.Item name="home">
@@ -67,6 +80,7 @@ export default class Header extends Component {
           <Menu.Item>
             <Input icon='search' placeholder='Buscar...' />
           </Menu.Item>
+          {userProfile}
           {!this.state.activeUser? (
             <Modal dimmer="blurring" trigger={
                 <Menu.Item name='Iniciar Sesión'/>
@@ -89,3 +103,13 @@ export default class Header extends Component {
     )
   }
 }
+
+function mapStateToProps({ currentUser, removeCurrentUser }){
+  return {
+    currentUser, removeCurrentUser
+  }
+}
+
+export default connect(
+  mapStateToProps,
+  { removeCurrentUser })(Header)

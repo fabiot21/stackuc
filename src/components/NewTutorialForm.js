@@ -16,7 +16,7 @@ class NewTutorialForm extends Component {
 
   onFormSubmit(e) {
     e.preventDefault();
-    if (this.state.title === 0 || this.state.content === 0 || this.state.tags.length === 0) {
+    if (this.state.title === 0 || this.state.content === 0 || this.state.tags.length === 0 || !auth.currentUser) {
       return false
     }
     const userEmail = auth.currentUser.email || null;
@@ -29,7 +29,8 @@ class NewTutorialForm extends Component {
         votes: 0,
         points: 0,
         comments: 0,
-        views: 0
+        views: 0,
+        author: auth.currentUser.email
       }
     }).then((data) => {
       if (this.props.location.pathname === '/tutoriales') {
