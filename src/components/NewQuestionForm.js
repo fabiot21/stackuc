@@ -34,12 +34,9 @@ class NewQuestionForm extends Component {
         author: auth.currentUser.email
       }
     }).then((data) => {
-      if (this.props.location.pathname === '/preguntas') {
-        window.location.reload()
-      } else {
-        this.props.history.push('/preguntas')
-        this.props.close()
-      }
+      this.props.close()
+      this.props.history.push('/preguntas')
+      window.location.reload()
       this.state.tags.split(',').map(tag => {
         return base.push(`tags/${tag.trim()}/questions/`, {
           data: {

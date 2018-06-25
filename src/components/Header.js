@@ -48,20 +48,22 @@ class Header extends Component {
             <Icon name='home' />
           </Link>
         </Menu.Item>
-        <Modal
-          onOpen={() => this.setState({ newQuestionOpen: true })}
-          onClose={() => this.setState({ newQuestionOpen: false })}
-          open={this.state.newQuestionOpen}
-          closeOnDimmerClick={false}
-          size="large"
-          dimmer="blurring"
-          trigger={
-            <Menu.Item name='hacer pregunta'/>
-          } closeIcon>
-          <Modal.Header>Hacer Pregunta</Modal.Header>
-          <NewQuestionForm close={() => this.setState({ newTutorialOpen: false })}/>
-        </Modal>
-        <Menu.Item name="crear tutorial">
+        {auth.currentUser? (
+          <Modal
+            onOpen={() => this.setState({ newQuestionOpen: true })}
+            onClose={() => this.setState({ newQuestionOpen: false })}
+            open={this.state.newQuestionOpen}
+            closeOnDimmerClick={false}
+            size="large"
+            dimmer="blurring"
+            trigger={
+              <Menu.Item name='hacer pregunta'/>
+            } closeIcon>
+            <Modal.Header>Hacer Pregunta</Modal.Header>
+            <NewQuestionForm close={() => this.setState({ newTutorialOpen: false })}/>
+          </Modal>
+        ) : null}
+        {auth.currentUser? (
           <Modal
             onOpen={() => this.setState({ newTutorialOpen: true })}
             onClose={() => this.setState({ newTutorialOpen: false })}
@@ -75,7 +77,7 @@ class Header extends Component {
             <Modal.Header>Nuevo Tutorial</Modal.Header>
             <NewTutorialForm close={() => this.setState({ newTutorialOpen: false })}/>
           </Modal>
-        </Menu.Item>
+        ) : null}
         <Menu.Menu position='right'>
           <Menu.Item>
             <Input icon='search' placeholder='Buscar...' />

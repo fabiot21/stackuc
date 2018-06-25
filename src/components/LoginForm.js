@@ -12,13 +12,23 @@ class LoginForm extends Component {
     this.state = {
       register: props.register,
       email: '',
-      password: ''
+      password: '',
+      loading: false,
+      error: false
     }
   }
 
   onLoginFormSubmit() {
+    this.setState({ loading: true })
     fLogin(this.state.email, this.state.password)
-      .then((data) => this.props.setUserInfo(this.state.email));
+      .then((data) => {
+        this.props.setUserInfo(this.state.email)
+        this.setState({ loading: false, error: false })
+      })
+      .catch(err => {
+        console.log(err)
+        this.setState({ error: true, loading: false })
+      })
   }
 
   render() {
@@ -60,8 +70,12 @@ class LoginForm extends Component {
                       value={this.state.password}
                       onChange={(e) => this.setState({ password: e.target.value })}
                       />
-
-                    <Button color='blue' fluid size='large'>Entrar</Button>
+                    {this.state.error? (
+                      <Message negative>
+                        <p>Usuario inválido</p>
+                      </Message>
+                    ) : null}
+                    <Button loading={this.state.loading} color='blue' fluid size='large'>Entrar</Button>
                   </Segment>
                 </Form>
                 <Message>
