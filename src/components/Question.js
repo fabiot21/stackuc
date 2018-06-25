@@ -137,6 +137,7 @@ class Question extends Component {
       then(data){
         let newState = {}
         data.map(answer => {
+
           newState['activateComment' + answer.key] = false
           newState['commentValue' + answer.key] = ''
           newState['confirmDialogOpenAnswerComment' + answer.key] = false
@@ -162,19 +163,29 @@ class Question extends Component {
 
   renderDeleteButton(key) {
     return (
-      <div onClick={() => this.setState({confirmDialogOpen: true}) } >
+      <div onClick={() => {
+        var newState = {}
+        newState[`confirmDialogOpen${key}`] = true
+        this.setState(newState)
+        }} >
         <Confirm
           dimmer="blurring"
           cancelButton = 'Cancelar'
           confirmButton = 'Si'
           content = '¿Estás seguro de borrar esta respuesta?'
-          open={this.state.confirmDialogOpen}
-          onCancel={() => this.setState({confirmDialogOpen: false})}
+          open={this.state[`confirmDialogOpen${key}`]}
+          onCancel={() => {
+            var newState = {}
+            newState[`confirmDialogOpen${key}`] = false
+            this.setState(newState)
+          }}
           onConfirm={() => {
             fBase.database().ref(`questions/${this.state.questionId}/answers`).transaction((i) => {
               return i - 1;
             }).then(() => {
-              this.setState({confirmDialogOpen: false}) ;
+              var newState = {}
+              newState[`confirmDialogOpen${key}`] = false
+              this.setState(newState)
               base.remove(`answers/${this.state.questionId}/${key}`)
             });
           }}
@@ -186,16 +197,26 @@ class Question extends Component {
 
   renderCommentDeleteButton(key) {
     return (
-      <div onClick={() => this.setState({confirmDialogOpenComment: true})}>
+      <div onClick={() => {
+        var newState = {}
+        newState[`confirmDialogOpenComment${key}`] = true
+        this.setState(newState)
+        }}>
         <Confirm
           dimmer="blurring"
           cancelButton = 'Cancelar'
           confirmButton = 'Si'
           content = '¿Estás seguro de borrar este comentario?'
-          open={this.state.confirmDialogOpenComment}
-          onCancel={() => this.setState({confirmDialogOpenComment: false})}
+          open={this.state[`confirmDialogOpenComment${key}`]}
+          onCancel={() => {
+            var newState = {}
+            newState[`confirmDialogOpenComment${key}`] = false
+            this.setState(newState)
+          }}
           onConfirm={() => {
-            this.setState({confirmDialogOpenComment: false}) ;
+            var newState = {}
+            newState[`confirmDialogOpenComment${key}`] = false
+            this.setState(newState)
             base.remove(`questions/${this.state.questionId}/comments/${key}`)
           }}
         />
@@ -208,6 +229,7 @@ class Question extends Component {
   renderAnswerCommentDeleteButton(keyAnswer, keyComment) {
     return (
       <div onClick={() => {
+        console.log("COMENTARIO PREGUNTA")
         var newState = {}
         newState[`confirmDialogOpenAnswerComment${keyComment}`] = true
         this.setState(newState)
@@ -318,7 +340,7 @@ class Question extends Component {
             <Segment>
               <Comment style={{ marginTop: '10px' }} >
                 <Comment.Avatar src={DefaultAvatar}/>
-                <div className="right pointer">
+                <div className="right pointer" >
                   {auth.currentUser && answer.userEmail === auth.currentUser.email? this.renderDeleteButton(answer.key) : null}
                 </div>
                 <Grid style={{ marginTop: '5px' }}>
