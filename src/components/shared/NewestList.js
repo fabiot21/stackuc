@@ -59,11 +59,8 @@ class NewestList extends Component {
             this.setState(newState);
           }}
           onConfirm={() => {
-            let newState = {...this.state};
-            newState[`dialogOpen${key}`] = false;
-            delete newState.list[i]
-            this.setState(newState);
             base.remove(`${this.props.data}/${key}/`);
+            this.fetchHandler()
           }}
         />
         <Icon color="red" name="delete" size="large" />
@@ -86,6 +83,10 @@ class NewestList extends Component {
   }
 
   componentDidMount() {
+    this.fetchHandler();
+  }
+
+  fetchHandler(){
     base.fetch(this.props.data, {
       context: this,
       asArray: true,
