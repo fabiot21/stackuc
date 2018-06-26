@@ -6,7 +6,7 @@ class UserContent extends Component {
 
   constructor(props){
     super(props)
-    this.state = {'data': [], 'contentStrings': {} }
+    this.state = {'data': [], 'contentStrings': {}, 'loaded':false }
     this.fetchDataFromFirebase = this.fetchDataFromFirebase.bind(this)
   }
 
@@ -17,6 +17,7 @@ class UserContent extends Component {
 
   componentWillReceiveProps(nextProps){
     this.setContentStrings(nextProps.contentType)
+    this.setState({'data': [], 'loaded': false})
   }
 
   setContentStrings(contentType){
@@ -41,6 +42,9 @@ class UserContent extends Component {
   }
 
   fetchDataFromFirebase(){
+    if(this.state.data.length != 0 || this.state.loaded===true){
+      return
+    }
     base.fetch(this.props.contentType+'/', {
       context: this,
       asArray: true,
@@ -49,7 +53,7 @@ class UserContent extends Component {
         equalTo: this.props.currentUser.userEmail
         },
       then(data){
-        this.setState({'data': data})
+        this.setState({'data': data, 'loaded':true})
       }
     });
   }
@@ -75,7 +79,7 @@ class UserContent extends Component {
     const htmlData = this.state.data.map( (content) => {
       return this.renderContentFeed(content)
     } )
-    if(htmlData.length === 0 ){
+    if(htmlData.length === 0 && this.state.loaded===false){
       return  <Loader active>Cargando</Loader>
     }
     return(
