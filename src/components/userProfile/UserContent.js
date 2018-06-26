@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Loader, Feed, Icon } from 'semantic-ui-react'
 import { base } from '../Firebase'
-import { connect } from 'react-redux'
 
 class UserContent extends Component {
 
@@ -97,12 +96,4 @@ class UserContent extends Component {
 }
 
 
-function mapStateToProps({ currentUser }){
-  return {
-    currentUser
-  }
-}
-
-export default connect(
-  mapStateToProps,
-  { })(UserContent)
+export default UserContent

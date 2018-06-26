@@ -19,11 +19,11 @@ class UserInfo extends Component {
   renderContent(){
     switch(this.state.optionPicked){
       case "preguntas":
-        return <UserContent contentType="questions" history={this.props.history}/>
+        return <UserContent contentType="questions" history={this.props.history} currentUser={this.props.currentUser}/>
       case "tutoriales":
-        return <UserContent contentType="tutorials" history={this.props.history}/>
+        return <UserContent contentType="tutorials" history={this.props.history} currentUser={this.props.currentUser}/>
       case "respuestas":
-        return <UserContent contentType="answers" history={this.props.history}/>
+        return <UserContent contentType="answers" history={this.props.history} currentUser={this.props.currentUser}/>
       default:
         return
     }
