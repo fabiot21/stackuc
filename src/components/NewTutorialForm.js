@@ -58,7 +58,7 @@ class NewTutorialForm extends Component {
             onChange={(e) => this.setState({ title: e.target.value})}
             />
           <Form.TextArea
-            rows="25"
+            rows="18"
             placeholder='Contenido'
             value={this.state.content}
             onChange={(e) => this.setState({ content: e.target.value})}
