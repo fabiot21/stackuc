@@ -326,7 +326,7 @@ class Question extends Component {
                 {auth.currentUser && this.state[`commentsData${answer.key}`][key].userEmail === auth.currentUser.email? this.renderAnswerCommentDeleteButton(answer.key, key) : null}
               </div>
               <Label color="teal" className="right" size="small">
-                {this.state[`commentsData${answer.key}`][key].content} - {this.state[`commentsData${answer.key}`][key].userEmail}
+                {this.state[`commentsData${answer.key}`][key].content} - <ClickableAuthor userEmail={this.state[`commentsData${answer.key}`][key].userEmail} history={this.props.history}/>
               </Label>
               <br />
               <br />
@@ -451,7 +451,7 @@ class Question extends Component {
             {auth.currentUser && comment.userEmail === auth.currentUser.email? this.renderCommentDeleteButton(comment.key) : null}
           </div>
           <Label color="blue" className="right" size="medium" key={comment.key}>
-            {comment.content} - {comment.userEmail}
+            {comment.content} - <ClickableAuthor userEmail={comment.userEmail} history={this.props.history}/>
           </Label>
           <br />
           <br />
