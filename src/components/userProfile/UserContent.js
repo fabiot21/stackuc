@@ -67,6 +67,7 @@ class UserContent extends Component {
     const questionSummary = (this.state.contentStrings.action +content.title + "")
     return(
       <Feed.Event
+        className="pointer"
         onClick = {()=>this.redirectToContent(content)}
         icon={this.state.contentStrings.icon}
         date='Hoy'

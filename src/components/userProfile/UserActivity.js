@@ -37,11 +37,6 @@ class UserInfo extends Component {
           active={this.state.optionPicked === 'tutoriales'}
           onClick={this.handleItemClick}
         />
-        <Menu.Item
-          name='respuestas'
-          active={this.state.optionPicked === 'respuestas'}
-          onClick={this.handleItemClick}
-        />
       </Menu>
       {this.renderContent()}
       </div>
