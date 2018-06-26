@@ -33,12 +33,9 @@ class NewTutorialForm extends Component {
         author: auth.currentUser.email
       }
     }).then((data) => {
-      if (this.props.location.pathname === '/tutoriales') {
-        window.location.reload()
-      } else {
-        this.props.history.push('/tutoriales')
-        this.props.close()
-      }
+      this.props.close()
+      this.props.history.push('/tutoriales')
+      window.location.reload()
       this.state.tags.split(',').map(tag => {
         return base.push(`tags/${tag.trim()}/tutorials/`, {
           data: {
