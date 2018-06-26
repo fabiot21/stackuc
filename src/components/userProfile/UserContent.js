@@ -24,15 +24,15 @@ class UserContent extends Component {
     var contentStrings= {"action": "", "route": "", "icon": ""}
     switch(contentType){
       case "questions":
-        contentStrings =  {"action": "Preguntaste ", "route": "preguntas",
+        contentStrings =  {"action": "Preguntó ", "route": "preguntas",
                 "icon": "question circle"}
         break
       case "tutorials":
-        contentStrings =  {"action": "Escribiste el tutorial ", "route": "tutoriales",
+        contentStrings =  {"action": "Escribió el tutorial ", "route": "tutoriales",
                 "icon": "pencil alternate"}
         break
         case "answers":
-          contentStrings =  {"action": "Respondiste la pregunta ", "route": "preguntas",
+          contentStrings =  {"action": "Respondió la pregunta ", "route": "preguntas",
                   "icon": "comment"}
           break
       default:
@@ -69,7 +69,7 @@ class UserContent extends Component {
       <Feed.Event
         onClick = {()=>this.redirectToContent(content)}
         icon={this.state.contentStrings.icon}
-        date='TODO: agregar fecha a todo'
+        date='Hoy'
         summary= {questionSummary}
       />
     )

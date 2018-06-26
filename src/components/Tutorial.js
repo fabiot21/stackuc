@@ -3,6 +3,7 @@ import { Statistic, Confirm, Icon, Segment, Label, Header,Form, Comment,Loader, 
 import ReactMarkdown from 'react-markdown';
 import { base, fBase } from './Firebase';
 import { auth } from './Firebase'
+import ClickableAuthor from './shared/ClickableAuthor'
 
 import DefaultAvatar from '../assets/default-avatar.png'
 
@@ -158,7 +159,7 @@ class Tutorial extends Component {
                 {auth.currentUser && comment.userEmail === auth.currentUser.email? this.renderDeleteButton(comment.key) : null}
               </div>
               <Comment.Content>
-                <Comment.Author as='a'>{comment.userEmail}</Comment.Author>
+              <Comment.Author as='a'><ClickableAuthor userEmail={comment.userEmail} history={this.props.history}/> </Comment.Author>
                 <Comment.Text>
                   <ReactMarkdown source={comment.content}/>
                 </Comment.Text>
@@ -205,6 +206,7 @@ class Tutorial extends Component {
         <h1> {this.state.tutorialData.title} </h1>
         <Rating icon='star' rating={this.state.personalRating} maxRating={5} onRate={(e, values) => this.submitRating(e, values)} />
         <br />
+        <p> Por <ClickableAuthor userEmail={this.state.tutorialData.author} history={this.props.history}/> </p>
         <br />
         {tags}
         <Segment>

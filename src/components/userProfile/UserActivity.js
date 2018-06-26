@@ -13,7 +13,6 @@ class UserInfo extends Component {
 
   handleItemClick(e, { name }){
       this.setState({optionPicked: name})
-      console.log(name)
   }
 
   renderContent(){
