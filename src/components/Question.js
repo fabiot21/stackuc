@@ -16,7 +16,7 @@ import {
 import ReactMarkdown from 'react-markdown';
 import { base, fBase } from './Firebase';
 import { auth } from './Firebase'
-
+import ClickableAuthor from './shared/ClickableAuthor'
 import DefaultAvatar from '../assets/default-avatar.png'
 
 class Question extends Component {
@@ -45,7 +45,6 @@ class Question extends Component {
     this.handleAuthStateChange();
     this.bindAnswers();
     this.bindComments();
-    console.log(this.state)
   }
 
 
@@ -229,7 +228,6 @@ class Question extends Component {
   renderAnswerCommentDeleteButton(keyAnswer, keyComment) {
     return (
       <div onClick={() => {
-        console.log("COMENTARIO PREGUNTA")
         var newState = {}
         newState[`confirmDialogOpenAnswerComment${keyComment}`] = true
         this.setState(newState)
@@ -328,7 +326,7 @@ class Question extends Component {
                 {auth.currentUser && this.state[`commentsData${answer.key}`][key].userEmail === auth.currentUser.email? this.renderAnswerCommentDeleteButton(answer.key, key) : null}
               </div>
               <Label color="teal" className="right" size="small">
-                {this.state[`commentsData${answer.key}`][key].content} - {this.state[`commentsData${answer.key}`][key].userEmail}
+                {this.state[`commentsData${answer.key}`][key].content} - <ClickableAuthor userEmail={this.state[`commentsData${answer.key}`][key].userEmail} history={this.props.history}/>
               </Label>
               <br />
               <br />
@@ -352,7 +350,7 @@ class Question extends Component {
                   )}
                 </Grid>
                 <Comment.Content style={{ marginTop: '25px' }}>
-                  <Comment.Author as='a'>{answer.userEmail}</Comment.Author>
+                  <Comment.Author as='a'><ClickableAuthor userEmail={answer.userEmail} history={this.props.history}/> </Comment.Author>
                   <Comment.Text>
                     <ReactMarkdown source={answer.content}/>
                   </Comment.Text>
@@ -453,7 +451,7 @@ class Question extends Component {
             {auth.currentUser && comment.userEmail === auth.currentUser.email? this.renderCommentDeleteButton(comment.key) : null}
           </div>
           <Label color="blue" className="right" size="medium" key={comment.key}>
-            {comment.content} - {comment.userEmail}
+            {comment.content} - <ClickableAuthor userEmail={comment.userEmail} history={this.props.history}/>
           </Label>
           <br />
           <br />
@@ -469,6 +467,7 @@ class Question extends Component {
         <h1> {this.state.questionData.title} </h1>
         <Rating icon='star' rating={this.state.personalRating} maxRating={5} onRate={(e, values) => this.submitQuestionRating(e, values)} />
         <br />
+        <p> Por <ClickableAuthor userEmail={this.state.questionData.author} history={this.props.history}/> </p>
         <br />
         {tags}
         <Segment>

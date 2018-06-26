@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
 import { Loader, Feed, Icon } from 'semantic-ui-react'
 import { base } from '../Firebase'
-import { connect } from 'react-redux'
 
 class UserContent extends Component {
 
   constructor(props){
     super(props)
-    this.state = {'data': [], 'contentStrings': {} }
+    this.state = {'data': [], 'contentStrings': {}, 'loaded':false }
     this.fetchDataFromFirebase = this.fetchDataFromFirebase.bind(this)
   }
 
@@ -18,21 +17,22 @@ class UserContent extends Component {
 
   componentWillReceiveProps(nextProps){
     this.setContentStrings(nextProps.contentType)
+    this.setState({'data': [], 'loaded': false})
   }
 
   setContentStrings(contentType){
     var contentStrings= {"action": "", "route": "", "icon": ""}
     switch(contentType){
       case "questions":
-        contentStrings =  {"action": "Preguntaste ", "route": "preguntas",
+        contentStrings =  {"action": "Preguntó ", "route": "preguntas",
                 "icon": "question circle"}
         break
       case "tutorials":
-        contentStrings =  {"action": "Escribiste el tutorial ", "route": "tutoriales",
+        contentStrings =  {"action": "Escribió el tutorial ", "route": "tutoriales",
                 "icon": "pencil alternate"}
         break
         case "answers":
-          contentStrings =  {"action": "Respondiste la pregunta ", "route": "preguntas",
+          contentStrings =  {"action": "Respondió la pregunta ", "route": "preguntas",
                   "icon": "comment"}
           break
       default:
@@ -42,6 +42,9 @@ class UserContent extends Component {
   }
 
   fetchDataFromFirebase(){
+    if(this.state.data.length != 0 || this.state.loaded===true){
+      return
+    }
     base.fetch(this.props.contentType+'/', {
       context: this,
       asArray: true,
@@ -50,7 +53,7 @@ class UserContent extends Component {
         equalTo: this.props.currentUser.userEmail
         },
       then(data){
-        this.setState({'data': data})
+        this.setState({'data': data, 'loaded':true})
       }
     });
   }
@@ -66,7 +69,7 @@ class UserContent extends Component {
       <Feed.Event
         onClick = {()=>this.redirectToContent(content)}
         icon={this.state.contentStrings.icon}
-        date='TODO: agregar fecha a todo'
+        date='Hoy'
         summary= {questionSummary}
       />
     )
@@ -76,7 +79,7 @@ class UserContent extends Component {
     const htmlData = this.state.data.map( (content) => {
       return this.renderContentFeed(content)
     } )
-    if(htmlData.length === 0 ){
+    if(htmlData.length === 0 && this.state.loaded===false){
       return  <Loader active>Cargando</Loader>
     }
     return(
@@ -97,12 +100,4 @@ class UserContent extends Component {
 }
 
 
-function mapStateToProps({ currentUser }){
-  return {
-    currentUser
-  }
-}
-
-export default connect(
-  mapStateToProps,
-  { })(UserContent)
+export default UserContent

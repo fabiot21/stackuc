@@ -7,15 +7,37 @@ import { base } from '../Firebase'
 import { connect } from 'react-redux'
 
 class UserProfile extends Component {
+
+  constructor(props){
+    super(props)
+    this.state = {"userData": {"userName":"" , "userEmail":""}}
+  }
+
+  componentDidMount(){
+    this.fetchUserEmail()
+  }
+
+  fetchUserEmail(){
+    const userName= this.props.match.params.userName
+      base.fetch('users/' + userName, {
+        context: this,
+        asArray: true,
+        then(data){
+          this.setState({"userData": {"userName": userName, "userEmail": data[0] }})
+        }
+      });
+    }
+
+
   render(){
     return(
       <Grid>
         <Grid.Column width={13}>
-          <UserActivity history={this.props.history}/>
+          <UserActivity history={this.props.history} currentUser={this.state.userData}/>
         </Grid.Column>
 
         <Grid.Column width={3}>
-            <UserInfo currentUser={this.props.currentUser}/>
+            <UserInfo currentUser={this.state.userData}/>
         </Grid.Column>
     </Grid>
     )
